@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager,login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -33,9 +33,9 @@ class User(db.Model, UserMixin):
     
     
 class RegistrationForm(FlaskForm):
-  username = StringField('Username', validators=[InputRequired(), length(min=4, max=80)])
-  email = StringField('Email', validators=[InputRequired(), length(min=3, max=255)])
-  password = StringField('Password', validators=[InputRequired(), length(min=8, max=20)])
+  username = StringField(validators=[InputRequired(), length(min=4, max=80)], render_kw={"placeholder": "Username"})
+  email = StringField(validators=[InputRequired(), length(min=3, max=255)], render_kw={"placeholder": "Email"})
+  password1 = PasswordField(validators=[InputRequired(), length(min=8, max=20)], render_kw={"placeholder": "Password"})
   submit = SubmitField('Register')
   
 
@@ -46,8 +46,8 @@ class RegistrationForm(FlaskForm):
     
     
 class LoginForm(FlaskForm):
-  email = StringField('Email', validators=[InputRequired(), length(min=3, max=255)])
-  password = PasswordField('Password', validators=[InputRequired()])
+  email = StringField('Email', validators=[InputRequired(), length(min=3, max=255)], render_kw={"placeholder": "Username"})
+  password = PasswordField(validators=[InputRequired(), length(min=8, max=20)], render_kw={"placeholder": "Password"})
   submit = SubmitField('Login')
   
   
@@ -83,16 +83,24 @@ def logout():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegistrationForm
+    flash('This is a test message.', 'info')
+    form = RegistrationForm()
     
-    if form.is_valid():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
-        db.session.add(user)
-        db.session.commit()
-        return redirect(url_for('login'))
+    if form.validate_on_submit():
+      hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+      user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+      db.session.add(user)
+      db.session.commit()
       
-    return render_template('register.html', form=form)
+      flash('Registration was successfull')
+      redirect(url_for('login'))
+      
+    return render_template('Register.html', form=form)
+  
+@app.route('/test-flash')
+def test_flash():
+    flash('This is a test message', 'info')
+    return redirect(url_for('home'))
   
 if __name__ == '__main__':
   app.run(debug=True)    
