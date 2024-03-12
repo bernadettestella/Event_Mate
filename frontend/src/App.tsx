@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
+import {
+  FormContainer,
+  Input,
+  Button,
+} from './styles';
 
-interface FormData {
+interface SignInData {
   username: string;
   password: string;
 }
@@ -11,22 +16,24 @@ interface ErrorResponse {
 }
 
 const SignInForm: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
+  const [signInData, setSignInData] = useState<SignInData>({
     username: '',
     password: '',
   });
   const [message, setMessage] = useState<string>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setSignInData({ ...signInData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/users', formData);
-      setMessage(response.data.message);
-      setFormData({ username: '', password: '' });
+      const response = await axios.post('/api/login', signInData);
+      // Assuming the backend returns a token upon successful login
+      const token = response.data.token;
+      // Redirect to user account page or perform any other action
+      window.location.href = '/account'; // Redirect to the account page
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError<ErrorResponse>;
@@ -37,47 +44,37 @@ const SignInForm: React.FC = () => {
     }
   };
 
-  const handleSignInClick = () => {
-    // Implement sign-in functionality here
+  const handleSignUpClick = () => {
+    // Redirect to the signup page
+    window.location.href = '/signup';
   };
 
   return (
-    <div>
-      <h2>Get Started</h2>
+    <FormContainer>
+      <h2>Sign In</h2>
       {message && <p>{message}</p>}
       <form onSubmit={handleSubmit}>
-        <label htmlFor="username">Username:</label>
-        <input
+        <Input
           type="text"
-          id="username"
           name="username"
-          value={formData.username}
+          placeholder="Username"
+          value={signInData.username}
           onChange={handleChange}
           required
         />
-      
-        <label htmlFor="password">Password:</label>
-        <input
+        <Input
           type="password"
-          id="password"
           name="password"
-          value={formData.password}
+          placeholder="Password"
+          value={signInData.password}
           onChange={handleChange}
           required
         />
-        <button type="submit">Sign Up</button>
-        <button type="button" onClick={handleSignInClick}>Sign In</button>
+        <Button type="submit">Sign In</Button>
+        <Button type="button" onClick={handleSignUpClick}>Sign Up</Button>
       </form>
-    </div>
+    </FormContainer>
   );
 };
 
-const App: React.FC = () => {
-  return (
-    <div>
-      <SignInForm />
-    </div>
-  );
-};
-
-export default App;
+export default SignInForm;
