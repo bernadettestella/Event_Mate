@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, length, ValidationError
-from models.user import User
+from backend.models.usher import Usher
 from shared.db import DB
 
 #DB INSTANCE INITIALIZED

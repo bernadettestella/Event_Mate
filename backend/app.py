@@ -1,21 +1,34 @@
 from flask import Flask, flash, jsonify, redirect, request, render_template, url_for
-from formtest.registration import LoginForm, DB, RegistrationForm
+## from formtest.registration import LoginForm, DB, RegistrationForm
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_required, login_user, logout_user
+from sqlalchemy.exc import NoResultFound
+from shared.auth import Auth, usher, planner
+from typing import Union
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'df02efcafd88339a979746fe'
 bcrypt = Bcrypt(app)
 
 
-
+AUTH = Auth()
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 @login_manager.user_loader
-def load_user(user_id):
-    return DB.searchUser(id=user_id)
+def load_user(user_id: str) -> Union[None, usher.Usher, planner.Planner]:
+    changed = user_id
+    try:
+       user = AUTH.db.search_user_by_id(usher.Usher, id=changed)
+       return user
+    except NoResultFound:
+       try:
+          user = AUTH.db.search_user_by_id(planner.Planner, id=changed)
+          return user
+       except NoResultFound:
+          return None
 
 
 @app.route("/", strict_slashes=False)
@@ -27,34 +40,48 @@ def index() -> str:
     return render_template('home.html')
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['POST', 'GET'])
 def register():
-    flash('This is a test message.', 'info')
-    form = RegistrationForm()
-    if form.validate_on_submit():
-      hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-      DB.registerUser(username=form.username.data, email=form.email.data, password=hashed_password)
-      flash('Registration was successfull')
-      redirect(url_for('login'))
-    return render_template('Register.html', form=form)
+    ### Change request.args.get() to request.form.get() ####
+    hashed_password = bcrypt.generate_password_hash(request.args.get('password'))
+    username = request.args.get('username')
+    usertype = request.args.get('usertype')
+    email = request.args.get('email')
 
-@app.route('/login', methods=['GET', 'POST'])
+    ### the usertype determines what type of user is registering (usher or planner)
+    user = AUTH.register_user(usertype, username=username, password=hashed_password, email=email)
+    if user is None:
+       return jsonify({"ERR": "User already exist"})
+    else:
+       return jsonify({user.username : user.id})
+
+
+@app.route('/login', methods=['POST', 'GET'])
 def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-      user = DB.searchUser(email=form.email.data)
-      if user and bcrypt.check_password_hash(user.password, form.password.data):
-        login_user(user, remember=form.remember.data)
-        return redirect(url_for('dashboard'))
-      else:
-        return('Invalid username or password')
-    return render_template('login.html', form=form)
+    ### Change request.args.get() to request.form.get() ####
+    username, password = (request.args.get('username'), request.args.get('password'))
+    usertype = request.args.get('usertype')
+
+    #Usertype determines what kind of user is logging-in (usher or planner)
+    try:
+       user = AUTH.login_user(usertype, username=username, password=password)
+       login_user(user)
+       return jsonify(user.get_data())
+    except NoResultFound as err:
+       return jsonify({"Error": err})
+
+
+@app.route('/dashboard', strict_slashes=False, methods=['GET', 'POST'])
+@login_required
+def dashboard():
+   uid = request.args.get('id')
+   user = load_user(uid)
+   return jsonify({user.username : user.is_active})
 
 @app.route('/logout', methods=['GET','POST'])
-@login_required
 def logout():
   logout_user()
-  return redirect(url_for('login'))
+  return redirect('/')
 
 
 if __name__ == "__main__":
