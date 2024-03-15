@@ -25,12 +25,12 @@ class DB:
         return self.__session
     
     def registerUser(self, db_table: Union[usher.Usher, planner.Planner], **kwargs) -> Union[usher.Usher, planner.Planner, None]:
-        user = usher.Usher()
+        user = db_table()
         try:
             for key, value in kwargs.items():                   
                 user.__setattr__(key, value)
-            print("CODE GOT HERE")
             self._session.add(user)
+            print("CODE GOT HERE")
             self._session.commit()
         except Exception:
             self._session.rollback()
@@ -58,4 +58,7 @@ class DB:
             raise NoResultFound()
         else:
             return result """
-        print(self._session.query(db_table).filter_by(id = myid).first())
+        
+        print("I AM FREE?, {}".format(
+            self._session.query(db_table).\
+                filter(db_table.id == myid).first()))

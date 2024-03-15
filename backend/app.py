@@ -1,7 +1,7 @@
 from flask import Flask, flash, jsonify, redirect, request, render_template, url_for
 ## from formtest.registration import LoginForm, DB, RegistrationForm
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, login_required, login_user, logout_user
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from sqlalchemy.exc import NoResultFound
 from shared.auth import Auth, usher, planner
 from typing import Union
@@ -17,18 +17,21 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+
 @login_manager.user_loader
 def load_user(user_id: str) -> Union[None, usher.Usher, planner.Planner]:
-    changed = user_id
     try:
-       user = AUTH.db.search_user_by_id(usher.Usher, id=changed)
+       user = AUTH.db.searchUser(usher.Usher, id=user_id)
+       print("trying.....................usher")
        return user
     except NoResultFound:
        try:
-          user = AUTH.db.search_user_by_id(planner.Planner, id=changed)
+          user = AUTH.db.searchUser(planner.Planner, id=user_id)
+          print("trying.....................planner")
           return user
        except NoResultFound:
-          return None
+         print("returning.............................None")
+         return None
 
 
 @app.route("/", strict_slashes=False)
@@ -65,18 +68,30 @@ def login():
     #Usertype determines what kind of user is logging-in (usher or planner)
     try:
        user = AUTH.login_user(usertype, username=username, password=password)
-       login_user(user)
-       return jsonify(user.get_data())
+       if user is not None:
+          login_user(user)
+          """login_user(user)
+          redirect_url = request.args.get("next")
+          if redirect_url is not None:
+             return redirect(redirect_url)"""
+          print(type(user.id))
+          return jsonify(user.get_data())
+       else:
+          return jsonify({"ERROR" : "USER NOT FOUND IN DB"})
     except NoResultFound as err:
-       return jsonify({"Error": err})
+       return jsonify({"Error": err.args[0], "reason" : "unauthorized user or invalid login reqst"})
 
 
 @app.route('/dashboard', strict_slashes=False, methods=['GET', 'POST'])
 @login_required
 def dashboard():
-   uid = request.args.get('id')
-   user = load_user(uid)
-   return jsonify({user.username : user.is_active})
+   return jsonify({"user": "loggedin"})
+
+"""@app.route("/session_login", methods=['GET', 'POST'])
+def session_login():
+   try:
+      
+"""
 
 @app.route('/logout', methods=['GET','POST'])
 def logout():

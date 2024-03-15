@@ -10,7 +10,7 @@ class Usher(BASE, UserMixin):
 
     __tablename__ = "ushers"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=lambda: uuid.uuid4(), unique=True)
+    id = Column(Integer, primary_key=True, unique=True)
     email = Column(String(250), nullable=True)
     username = Column(String(250), nullable=False)
     password = Column(String(250), nullable=True)

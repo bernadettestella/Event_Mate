@@ -23,6 +23,7 @@ class Auth:
                 return None
             except NoResultFound:
                 new_user = self.db.registerUser(models.get(cls), **kwargs)
+                print(new_user)
                 if new_user is None:
                     raise InvalidRequestError("add required parms as stated in the {} model".format(cls))
                 else:
