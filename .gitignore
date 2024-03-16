@@ -2,4 +2,8 @@
 pyenv
 venv
 myenv
+penv
 
+
+#### PyCACHE ########
+__pycache__/*
