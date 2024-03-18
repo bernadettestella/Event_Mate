@@ -1,12 +1,15 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
-import axios from 'axios';
+import { useState } from 'react';
+//import axios from 'axios';
 import styled from 'styled-components';
 
 const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 400px;
+  margin-left: 120%;
+  margin-right: auto;
   height: 100vh;
 `;
 
@@ -39,13 +42,13 @@ const ErrorMessage = styled.p`
 `;
 
 export const Button = styled.button`
-padding: 10px 0; /* Adjust padding to cover input width */
-background-color: #007bff;
-color: #fff;
-border: none;
-border-radius: 4px;
-cursor: pointer;
-width: 100%;
+  padding: 10px 0; /* Adjust padding to cover input width */
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
 `;
 
 const SignUpForm = () => {
@@ -53,6 +56,7 @@ const SignUpForm = () => {
     email: '',
     username: '',
     password: '',
+    confirmPassword: '', // New field
     mobile: '',
     location: '',
   });
@@ -64,6 +68,10 @@ const SignUpForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (signUpData.password !== signUpData.confirmPassword) {
+      setMessage('Passwords do not match');
+      return;
+    }
     try {
       // Implement sign-up functionality using signUpData
       setMessage('Sign up functionality will be implemented here.');
@@ -107,6 +115,17 @@ const SignUpForm = () => {
               id="password"
               name="password"
               value={signUpData.password}
+              onChange={handleChange}
+              required
+            />
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="confirmPassword">Confirm Password:</Label>
+            <Input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={signUpData.confirmPassword}
               onChange={handleChange}
               required
             />

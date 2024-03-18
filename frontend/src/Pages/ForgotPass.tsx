@@ -7,11 +7,12 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin-left: 150%;
   height: 100vh;
 `;
 
 const Form = styled.form`
-  width: 300px;
+  width: 400px;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;

@@ -4,6 +4,8 @@ export const PageContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 400px;
+  margin-left: 100%;
   height: 100vh;
 `;
 
@@ -29,13 +31,13 @@ export const ButtonContainer = styled.div`
 `;
 
 export const Button = styled.button`
-  padding: 10px 0; /* Adjust padding to cover input width */
+  padding: 10px 0; 
   background-color: #007bff;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  width: 100%; /* Button covers the width of the input */
+  width: 105%; 
 `;
 
 export const ForgotPasswordLink = styled.span`
