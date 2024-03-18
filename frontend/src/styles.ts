@@ -2,15 +2,16 @@ import styled from 'styled-components';
 
 export const PageContainer = styled.div`
   display: flex;
-  justify-content: center; /* Center the content horizontally */
-  align-items: center; /* Center the content vertically */
-  height: 100vh; /* Make the container take up the full height of the viewport */
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 `;
 
 export const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 300px; /* Adjust width as needed */
 `;
 
 export const Input = styled.input`
@@ -23,14 +24,23 @@ export const Input = styled.input`
 
 export const ButtonContainer = styled.div`
   display: flex;
+  flex-direction: column;
   gap: 10px; /* Spacing between buttons */
 `;
 
 export const Button = styled.button`
-  padding: 10px 20px;
+  padding: 10px 0; /* Adjust padding to cover input width */
   background-color: #007bff;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  width: 100%; /* Button covers the width of the input */
+`;
+
+export const ForgotPasswordLink = styled.span`
+  margin-top: 10px; /* Add space between buttons and link */
+  cursor: pointer;
+  color: blue;
+  text-decoration: underline;
 `;

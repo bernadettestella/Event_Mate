@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { PageContainer, FormContainer, Input, ButtonContainer, Button } from './styles';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+
+import SignUpForm from './Pages/SignUp';
+import ForgotPasswordForm from './Pages/ForgotPass';
+
+import { PageContainer, FormContainer, Input, ButtonContainer, Button, ForgotPasswordLink } from './styles';
 
 interface SignInData {
   username: string;
@@ -39,9 +45,15 @@ const SignInForm: React.FC = () => {
       }
     }
   };
+
   const handleSignUpClick = () => {
     // Redirect to the signup page
-    window.location.href = '/signup';
+    window.location.href = './Pages/SignUp';
+  };
+
+  const handleForgotPasswordClick = () => {
+    // Redirect to the forgot password page
+    window.location.href = './Pages/ForgotPass';
   };
 
   return (
@@ -70,19 +82,22 @@ const SignInForm: React.FC = () => {
             <Button type="submit">Sign In</Button>
             <Button type="button" onClick={handleSignUpClick}>Sign Up</Button>
           </ButtonContainer>
+          <ForgotPasswordLink onClick={handleForgotPasswordClick}>Forgot Password?</ForgotPasswordLink>
         </form>
       </FormContainer>
     </PageContainer>
   );
-};
-
+}; 
 
 const App: React.FC = () => {
   return (
-    <div>
-      <SignInForm />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<SignInForm />} />
+        <Route path="/Pages/SignUp" element={<SignUpForm />} />
+        <Route path="/Pages/ForgotPass" element={<ForgotPasswordForm />} />
+      </Routes>
+    </Router>
   );
 };
-
 export default App;
