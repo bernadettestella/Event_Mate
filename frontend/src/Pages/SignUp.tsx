@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useState } from 'react';
-//import axios from 'axios';
+import axios from 'axios';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -56,27 +56,25 @@ const SignUpForm = () => {
     email: '',
     username: '',
     password: '',
-    confirmPassword: '', // New field
+    confirmPassword: '', 
     mobile: '',
     location: '',
   });
   const [message, setMessage] = useState('');
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSignUpData({ ...signUpData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (signUpData.password !== signUpData.confirmPassword) {
-      setMessage('Passwords do not match');
-      return;
-    }
     try {
-      // Implement sign-up functionality using signUpData
-      setMessage('Sign up functionality will be implemented here.');
+      const response = await axios.post('/register', signUpData);
+      // Handle successful registration
+      console.log(response.data);
     } catch (error) {
-      setMessage('An error occurred during sign-up.');
+      // Handle registration error
+      console.error(error);
     }
   };
 
