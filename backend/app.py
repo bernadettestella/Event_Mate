@@ -6,8 +6,8 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, length, ValidationError
 from flask_bcrypt import Bcrypt
 import secrets
-from itsdangerous import TimedJsonWebSignatureSerializer as Serializer, SignatureExpired, BadSignature
-from email import send_email
+from itsdangerous import TimedSerializer as Serializer, SignatureExpired, BadSignature
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
 db = SQLAlchemy()
@@ -104,7 +104,7 @@ def register():
       
     return render_template('Register.html', form=form)
   
-@app.route('/forgot password', method=[ 'POST'])
+@app.route('/forgot password', methods=["POST"])
 def forgot_password():
   email_data = request.form['email']
   if not email_data or not email_data.get('email'):
@@ -124,8 +124,12 @@ def forgot_password():
   
   return jsonify({'message': 'Password reset link sent to your email'})
 
+def send_email(user_email, token):
+  
+    pass
 
-@app.route("/reset_password/<token>", methods=["GET", "POST"])
+
+@app.route("/reset_password/<token>", methods=["POST"])
 def reset_password(token):
     serializer = Serializer(app.config['SECRET_KEY'])
     try:
