@@ -194,13 +194,13 @@ const SignUpForm = () => {
                 <option value="female">Female</option>
                 <option value="other">Other</option>
               </Select>
-              <Label htmlFor="height">Height:</Label>
               <Input
                 type="text"
                 id="height"
                 name="height"
                 value={signUpData.height}
                 onChange={handleChange}
+                placeholder={`Enter your Height`}
                 required
               />
             </FormGroup>

@@ -30,6 +30,7 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({ onCountrySelect }) =>
 
   return (
     <select name="countryCode" value={selectedCountry.value} onChange={handleChange}>
+    <option >Select country</option> 
     <option data-mobileCode="+44" value="44">United Kingdom (+44)</option>
     <option data-mobileCode="+1" value="1">United States (+1)</option>
 		<option data-countryCode="DZ" value="213">Algeria (+213)</option>
