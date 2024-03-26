@@ -44,3 +44,9 @@ class Auth:
                 return None
         else:
             raise NoResultFound("Invalid Class Defined")
+        
+    def set_session(self, person: Union[usher.Usher, planner.Planner], session) -> Union[usher.Usher, planner.Planner, None]:
+        if person is not None:
+            person.session_id = session
+            
+    

@@ -1,0 +1,4 @@
+import requests
+
+respo = requests.get("http://localhost:5000/dashboard", cookies={"session" : ".eJzdkE1qxDAMha9ivE6KZcl_OUX3ZRhkW54E0pkSZ1bD3L2G3qIbCfGk9z700te2c1-l6-XrpdU5mv6W3vkmetKfu3AXtT9uarur86G4lCGqc926-hk7H_rynv753WUaTzqkr3o5j6eMaat60bnlBB5cJOsSWw6SPYcUgyVCQ94EaiH7nGzM2RiLjg1USUkcYjZUbUV0AQDBcWlGCvsG7MXTMAOsNXimRhmdFSqxksdaEEtO3nnrBv712eX4oxm5gVvkQQA1AdsiCcJwL5ZGOCGxjCreBkzJyBwjykzOhjlmhzMTFKgVWklOv38BhAyieg.ZgMJoA.6oc7q1wGzDPjYsF1UqufaL95Fdw"})
+print(respo.text)
