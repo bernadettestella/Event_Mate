@@ -7,12 +7,12 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-left: 150%;
+  margin-left: 120%;
   height: 100vh;
 `;
 
 const Form = styled.form`
-  width: 400px;
+  width: 500px;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -24,7 +24,7 @@ const Label = styled.label`
 `;
 
 const Input = styled.input`
-  width: 100%;
+  width:96%;
   padding: 8px;
   margin-bottom: 16px;
   border: 1px solid #ccc;
@@ -39,6 +39,13 @@ const Button = styled.button`
   border: none;
   border-radius: 4px;
   cursor: pointer;
+`;
+const SignInLink = styled.a`
+  display: block;
+  margin-top: 10px;
+  text-align: center;
+  color: blue;
+  text-decoration: underline;
 `;
 
 const Message = styled.p`
@@ -69,7 +76,7 @@ const ForgottenPasswordPage: React.FC = () => {
       <Form onSubmit={handleSubmit}>
         <h2>Forgotten Password</h2>
         {message && <Message>{message}</Message>}
-        <Label htmlFor="email">Email:</Label>
+        <Label htmlFor="email">Enter your registered email address</Label>
         <Input
           type="email"
           id="email"
@@ -77,7 +84,9 @@ const ForgottenPasswordPage: React.FC = () => {
           onChange={handleChange}
           required
         />
-        <Button type="submit">Submit</Button>
+        
+        <Button type="submit">Request reset link</Button>
+        <SignInLink href="/">Back to Sign In</SignInLink>
       </Form>
     </Container>
   );
