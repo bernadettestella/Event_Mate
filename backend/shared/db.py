@@ -30,7 +30,7 @@ class DB:
             for key, value in kwargs.items():                   
                 user.__setattr__(key, value)
             self._session.add(user)
-            print("CODE GOT HERE")
+            """print("CODE GOT HERE")"""
             self._session.commit()
         except Exception as e:
             print(e.args[0] + "HELLO")

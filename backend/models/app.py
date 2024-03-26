@@ -17,6 +17,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 
+
 @login_manager.user_loader
 def load_user(user_id: str) -> Union[None, usher.Usher, planner.Planner]:
     try:
@@ -65,7 +66,7 @@ def login():
       username, password = (request.args.get('username'), request.args.get('password'))
       usertype = request.args.get('usertype')
       session_id = request.cookies.get("session")
-      
+
       #Usertype determines what kind of user is logging-in (usher or planner)
       user = AUTH.login_user(usertype, username=username, password=password)
       if user is not None:
@@ -80,7 +81,7 @@ def login():
          return jsonify({"ERROR" : "USER NOT FOUND IN DB"})
    except NoResultFound as err:
        return jsonify({"Error": err.args[0], "reason" : "unauthorized user or invalid login reqst"})
-      
+
 
 @app.route('/dashboard', strict_slashes=False, methods=['GET', 'POST'])
 @login_required
