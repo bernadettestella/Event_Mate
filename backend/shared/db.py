@@ -4,7 +4,7 @@ from sqlalchemy.orm.session import Session
 from shared import BASE
 from models import usher, planner
 from sqlalchemy.exc import InvalidRequestError, NoResultFound
-from typing import Union
+from typing import Union, List
 
 
 
@@ -32,7 +32,8 @@ class DB:
             self._session.add(user)
             print("CODE GOT HERE")
             self._session.commit()
-        except Exception:
+        except Exception as e:
+            print(e.args[0] + "HELLO")
             self._session.rollback()
             user = None
         return user
@@ -51,14 +52,21 @@ class DB:
             if result is None:
                 raise NoResultFound()
             return result
-                
-    def search_user_by_id(self, db_table: Union[usher.Usher, planner.Planner], myid:str):
-        """result = self._session.query(db_table).filter(db_table.id == id).first()
+    
+    """def search_user_by_id(self, db_table: Union[usher.Usher, planner.Planner], myid:str):
+        result = self._session.query(db_table).filter(db_table.id == id).first()
         if result is None:
             raise NoResultFound()
         else:
-            return result """
+            return result 
         
         print("I AM FREE?, {}".format(
             self._session.query(db_table).\
-                filter(db_table.id == myid).first()))
+                filter(db_table.id == myid).first()))"""
+
+    def list_all_users(self, user: Union[usher.Usher, planner.Planner]) -> List[str]:
+        values = self._session.query(user).filter(user.id != None).all()
+        mylist = []
+        for items in values:
+            mylist.append(items.id)
+        return mylist
