@@ -43,7 +43,7 @@ export const SignIn = styled.div`
 export const CreateAccount = styled.div`
   margin-top: 5%;
   text-decoration: underline;
-  text-align: right;
+  justify-content: right;
  
 `;
 

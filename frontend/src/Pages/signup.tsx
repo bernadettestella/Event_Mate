@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
+import Navbar from '../Components/Navbar';
 import CountrySelector from '../Components/Country';
-
 import backgroundImage from '../assets/background.jpg';
 
 // Styled components for styling
