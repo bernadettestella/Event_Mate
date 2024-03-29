@@ -31,7 +31,14 @@ export const FormContainer = styled.span`
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   padding: 5%;
   height: 78.2vh;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
 `;
+
+.FormContainer.show {
+  max-height: 500px; /* Adjust height as needed */
+}
 
 export const SignIn = styled.div`
   margin-top: 5%;
