@@ -130,7 +130,7 @@ def user(user_type, user_id):
       except:
          return abort(400)
    try:
-      user = AUTH.db.searchUser(models.get(user_type), id=user_id)
+      user = AUTH.db.searchitem(models.get(user_type), id=user_id)
       return jsonify({"user" : user.id})
    except NoResultFound:
       return jsonify({"err" : "No result found"})
@@ -139,7 +139,7 @@ def user(user_type, user_id):
 def forget_password():
    email = request.json.get('email')
    
-   user = AUTH.db.searchUser(usher.Usher, email=email)
+   user = AUTH.db.searchitem(usher.Usher, email=email)
    if user is not None:
       return jsonify(user.get_data())
    else:
