@@ -1,6 +1,9 @@
 import React from 'react';
 import { Carousel } from 'react-responsive-carousel';
 import styled from 'styled-components';
+import backgroundImage from '../assets/background.jpg';
+import usherImage1 from '../assets/usher2.jpg';
+import usherImage2 from '../assets/usher3.jpg';
 
 // Define styled components
 const Container = styled.div`
@@ -21,17 +24,17 @@ const Slide = styled.div`
 
 // Image data
 const images = [
-  { id: 1, url: 'image1.jpg' },
-  { id: 2, url: 'image2.jpg' },
-  { id: 3, url: 'image3.jpg' },
+  { id: 1, url: backgroundImage },
+  { id: 2, url: usherImage1 },
+  { id: 3, url: usherImage2 },
   // Add more images as needed
 ];
 
 const Home: React.FC = () => {
   return (
     <Container>
-        <Title>Welcome to EventMate</Title>
-      <Description>Where ushers and event planners meet!</Description>
+      <h1>Welcome to EventMate</h1>
+      <p>Where ushers and event planners meet!</p>
       <Carousel autoPlay interval={5000} showThumbs={false} showStatus={false}>
         {images.map(image => (
           <Slide key={image.id} imageUrl={image.url} />
