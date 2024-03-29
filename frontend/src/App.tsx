@@ -3,6 +3,7 @@ import axios from 'axios';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaKey, FaUser } from 'react-icons/fa'; // Import icons for show/hide password
 import Input from './Components/Input';
+import Navbar from './Components/Navbar'; 
 import SignUpForm from './Pages/SignUp';
 import ForgotPasswordForm from './Pages/ForgotPass';
 import { BackgroundSection, FormSection, FormContainer,SignIn, CreateAccount, ButtonContainer, Button, ForgotPasswordLink, SignInFooter, RememberMeLabel, TermsOfServiceLink } from './styles';
@@ -121,12 +122,18 @@ const SignInForm: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Router>
+      <Navbar /> {/* Include the Navbar component */}
       <Routes>
-        <Route path="/" element={<SignInForm />} />
-        <Route path="/Pages/SignUp" element={<SignUpForm />} />
-        <Route path="/Pages/ForgotPass" element={<ForgotPasswordForm />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/signup" element={<SignUpForm />} />
+        <Route path="/signin" element={<SignInForm />} />
+        <Route path="/forgot-password" element={<ForgotPasswordForm />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/blog" element={<Blog />} />
+        {/* Add more routes as needed */}
       </Routes>
     </Router>
   );
 };
+
 export default App;
