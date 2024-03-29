@@ -25,7 +25,7 @@ export const FormSection = styled.div`
 
 `;
 
-export const FormContainer = styled.span`
+export const FormContainer = styled.div`
   width: 30%;
   background-color: #ffffff;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -34,11 +34,16 @@ export const FormContainer = styled.span`
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s ease-in-out;
-`;
 
-.FormContainer.show {
-  max-height: 500px; /* Adjust height as needed */
-}
+  &.show {
+    max-height: 500px;
+  }
+
+  @media screen and (max-width: 768px) {
+    /* Apply styles for screens smaller than 768px width */
+    width: 80%; /* Adjust width as needed */
+  }
+`;
 
 export const SignIn = styled.div`
   margin-top: 5%;
