@@ -4,11 +4,27 @@ from flask_login import LoginManager, login_required, login_user, logout_user
 from sqlalchemy.exc import NoResultFound
 from shared.auth import Auth, usher, planner
 from typing import Union
+from flask_mail import Mail, Message
+from flask_jwt_extended import JWTManager, create_access_token, decode_token
+import datetime
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'df02efcafd88339a979746fe'
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'k1b5M@example.com'
+app.config['MAIL_PASSWORD'] = 'yourpassword'
+app.config["JWT_SECRET_KEY"] = "super-secret"
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(hours=1)
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = datetime.timedelta(days=30)
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+
+
 bcrypt = Bcrypt(app)
+mail = Mail(app)
+jwt = JWTManager(app)
 
 
 AUTH = Auth()
@@ -117,7 +133,52 @@ def user(user_type, user_id):
       return jsonify({"user" : user.id})
    except NoResultFound:
       return jsonify({"err" : "No result found"})
+   
+@app.route('/forget-password', methods=['POST'])
+def forget_password():
+   email = request.json.get('email')
+   
+   user = AUTH.db.searchUser(usher.Usher, email=email)
+   if user is not None:
+      return jsonify(user.get_data())
+   else:
+      return jsonify({"error": "User not found"})
+   
+   expires = datetime.timedelta(days=1)
+   reset_token = jwt.encode(
+      {'email': email, 'exp': datetime.datetime.utcnow() + expires},
+   )
+   
+   user = AUTH.db.searchUser(planner.Planner, email=email)
+   if user is not None:
+      return jsonify(user.get_data())
+   else:
+      return jsonify({"error": "User not found"})
+   
+   expires = datetime.timedelta(days=1)
+   reset_token = jwt.encode(
+      {'email': email, 'exp': datetime.datetime.utcnow() + expires},
+   )
+   
+   
+   msg = Message('Password Reset Request', sender = 'kRkFQ@example.com', recipients = [email])
+   msg.body = f"To reset your password, visit the following link: {reset_token}"
+   mail.send(msg)
+   
+   return jsonify({"message": "Password reset email sent"}), 200
 
+@app.route('/reset-password/<token>', methods=['POST'])
+def reset_password(token):
+   new_password = request.json.get('new_password')
+   try:
+      user_id = decode_token(token)['identity']
+      
+      update_user_password(user_id, new_password)
+      return jsonify({"message": "Password updated successfully"}), 200
+   except jwt.ExpiredSignatureError:
+      return jsonify({"message": "Password reset token has expired"}), 400
+   except jwt.InvalidTokenError:
+      return jsonify({"message": "Invalid password reset token"}), 400
 
 @app.route('/logout', methods=['GET','POST'])
 def logout():
