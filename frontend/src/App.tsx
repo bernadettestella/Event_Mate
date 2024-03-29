@@ -5,8 +5,10 @@ import { FaEye, FaEyeSlash, FaKey, FaUser } from 'react-icons/fa'; // Import ico
 import Input from './Components/Input';
 import Navbar from './Components/Navbar'; 
 import Home from './Pages/home';
+import AboutPage from './Pages/about';
 import SignUpForm from './Pages/signin';
 import SignUpForm from './Pages/SignUp';
+import BlogPage from './Pages/blog';
 import ForgotPasswordForm from './Pages/ForgotPass';
 import { BackgroundSection, FormSection, FormContainer,SignIn, CreateAccount, ButtonContainer, Button, ForgotPasswordLink, SignInFooter, RememberMeLabel, TermsOfServiceLink } from './styles';
 
