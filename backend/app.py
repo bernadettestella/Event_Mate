@@ -1,6 +1,6 @@
 from flask import Flask, abort, flash, jsonify, redirect, request, render_template, url_for
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, login_required, login_user, logout_user
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from sqlalchemy.exc import NoResultFound
 from shared.auth import Auth, usher, planner
 from typing import Union
@@ -37,12 +37,12 @@ login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(user_id: str) -> Union[None, usher.Usher, planner.Planner]:
     try:
-       user = AUTH.db.searchUser(usher.Usher, id=user_id)
+       user = AUTH.db.searchitem(usher.Usher, id=user_id)
        print("trying.....................usher")
        return user
     except NoResultFound:
        try:
-          user = AUTH.db.searchUser(planner.Planner, id=user_id)
+          user = AUTH.db.searchitem(planner.Planner, id=user_id)
           print("trying.....................planner")
           return user
        except NoResultFound:
@@ -102,7 +102,8 @@ def login():
 @app.route('/dashboard', strict_slashes=False, methods=['GET', 'POST'])
 @login_required
 def dashboard():
-   return jsonify({"user": request.blueprint})
+   user : Union[usher.Usher | planner.Planner] = current_user
+   return jsonify({"user": user.username})
 
 
 @app.route("/users/<user_type>", methods=["GET"])
@@ -129,7 +130,7 @@ def user(user_type, user_id):
       except:
          return abort(400)
    try:
-      user = AUTH.db.searchUser(models.get(user_type), id=user_id)
+      user = AUTH.db.searchitem(models.get(user_type), id=user_id)
       return jsonify({"user" : user.id})
    except NoResultFound:
       return jsonify({"err" : "No result found"})
@@ -138,7 +139,7 @@ def user(user_type, user_id):
 def forget_password():
    email = request.json.get('email')
    
-   user = AUTH.db.searchUser(usher.Usher, email=email)
+   user = AUTH.db.searchitem(usher.Usher, email=email)
    if user is not None:
       return jsonify(user.get_data())
    else:
@@ -180,6 +181,41 @@ def reset_password(token):
    except jwt.InvalidTokenError:
       return jsonify({"message": "Invalid password reset token"}), 400
 
+   
+@app.route("/postjob", methods=["GET", "POST"])
+@login_required
+def postjob():
+   # ensure all forms fields are collected using request.form.get() and passed as
+   # second arguments to the AUTH.search_secific_table() function below
+   user = current_user
+   confirmed_user = AUTH.search_specific_table("planner", id=user.id)
+   if confirmed_user is None:
+      abort(400)
+   try:
+      AUTH.db.postjob(confirmed_user.id, job_amount=2000)
+      return jsonify({"status" : "ok"})
+   except:
+      abort(400)
+   
+"""@app.route("/hire/<usher_id>/<job_id>")
+@login_required
+def hire(usher_id, job_id):
+   try:
+      AUTH.hire(usher_id, job_id)
+      return jsonify({"status": "ok"})
+   except:
+      abort(400)"""
+
+@app.route("/update/<user_type>/<user_id>")
+@login_required
+def update_user(user_type, user_id):
+   try:
+      updated_user = AUTH.update_item(user_type, user_id, age=30)
+      return jsonify({"status" : "ok", "response" : updated_user.age})
+   except:
+      abort(400)
+   
+   
 @app.route('/logout', methods=['GET','POST'])
 def logout():
   logout_user()
