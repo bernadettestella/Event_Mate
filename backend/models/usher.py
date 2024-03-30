@@ -44,5 +44,3 @@ class Usher(BASE, UserMixin):
             "job" : self.job
 
             }
-    def to_json(self):
-        
