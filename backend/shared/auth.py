@@ -87,4 +87,3 @@ class Auth:
             return updated_job
         except:
             raise Exception("Error Adding Usher To Job")
-    
