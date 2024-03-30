@@ -63,7 +63,7 @@ class Auth:
             return None
 
 
-    def update_item(self, table_to_update : str, item_id_to_update:str, **kwargs):
+    def update_item(self, table_to_update:str, item_id_to_update:str, **kwargs):
         result = self.search_specific_table(table_to_update, id=item_id_to_update)
         if result is None:
             raise Exception("INVALID ID")
@@ -74,7 +74,7 @@ class Auth:
             raise Exception("ERROR UPDATING {}".format(result.__dict__.__class__.__name__))
 
         
-    """def hire(self, usher_id, job_id):
+    def hire(self, usher_id, job_id):
         job = self.search_specific_table("job", id=job_id)
         usher = self.search_specific_table("usher", id=usher_id)
         if job == None or usher == None:
@@ -82,5 +82,5 @@ class Auth:
         try:
             self.db.process_hire(job, usher)
         except:
-            raise Exception("Error Adding Usher To Job")"""
+            raise Exception("Error Adding Usher To Job")
     

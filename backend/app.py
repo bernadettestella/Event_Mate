@@ -130,7 +130,7 @@ def user(user_type, user_id):
       except:
          return abort(400)
    try:
-      user = AUTH.db.searchitem(models.get(user_type), id=user_id)
+      user = AUTH.db.searchUser(models.get(user_type), id=user_id)
       return jsonify({"user" : user.id})
    except NoResultFound:
       return jsonify({"err" : "No result found"})
@@ -139,13 +139,13 @@ def user(user_type, user_id):
 def forget_password():
    email = request.json.get('email')
    
-   user = AUTH.db.searchitem(usher.Usher, email=email)
+   user = AUTH.db.searchUser(usher.Usher, email=email)
    if user is not None:
       return jsonify(user.get_data())
    else:
       return jsonify({"error": "User not found"})
    
-   expires = datetime.timedelta(days=1)
+"""   expires = datetime.timedelta(days=1)
    reset_token = jwt.encode(
       {'email': email, 'exp': datetime.datetime.utcnow() + expires},
    )
@@ -166,7 +166,7 @@ def forget_password():
    msg.body = f"To reset your password, visit the following link: {reset_token}"
    mail.send(msg)
    
-   return jsonify({"message": "Password reset email sent"}), 200
+   return jsonify({"message": "Password reset email sent"}), 200"""
 
 @app.route('/reset-password/<token>', methods=['POST'])
 def reset_password(token):
@@ -174,7 +174,7 @@ def reset_password(token):
    try:
       user_id = decode_token(token)['identity']
       
-      update_user_password(user_id, new_password)
+      #update_user_password(user_id, new_password)
       return jsonify({"message": "Password updated successfully"}), 200
    except jwt.ExpiredSignatureError:
       return jsonify({"message": "Password reset token has expired"}), 400
@@ -197,14 +197,14 @@ def postjob():
    except:
       abort(400)
    
-"""@app.route("/hire/<usher_id>/<job_id>")
+@app.route("/hire/<usher_id>/<job_id>")
 @login_required
 def hire(usher_id, job_id):
    try:
       AUTH.hire(usher_id, job_id)
       return jsonify({"status": "ok"})
    except:
-      abort(400)"""
+      abort(400)
 
 @app.route("/update/<user_type>/<user_id>")
 @login_required
