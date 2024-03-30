@@ -6,13 +6,13 @@ import Input from './Components/Input';
 import Navbar from './Components/Navbar'; 
 import Home from './Pages/home';
 import AboutPage from './Pages/about';
-import SignUpForm from './Pages/signin';
+import SignInForm from './Pages/signin';
 import SignUpForm from './Pages/SignUp';
 import BlogPage from './Pages/blog';
 import ForgotPasswordForm from './Pages/ForgotPass';
 import { BackgroundSection, FormSection, FormContainer,SignIn, CreateAccount, ButtonContainer, Button, ForgotPasswordLink, SignInFooter, RememberMeLabel, TermsOfServiceLink } from './styles';
 
-import backgroundImage from './assets/background.jpg'; // Import your background image
+//import backgroundImage from './assets/background.jpg'; // Import your background image
 
 
 
@@ -22,11 +22,11 @@ const App: React.FC = () => {
       <Navbar /> {/* Include the Navbar component */}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<SignUpForm />} />
-        <Route path="/signin" element={<SignInForm />} />
+        <Route path="./Pages/signup" element={<SignUpForm />} />
+        <Route path="./Pages/signin" element={<SignInForm />} />
         <Route path="/forgot-password" element={<ForgotPasswordForm />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/blog" element={<Blog />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/blog" element={<BlogPage />} />
         {/* Add more routes as needed */}
       </Routes>
     </Router>
