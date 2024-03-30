@@ -1,3 +1,4 @@
+import json
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
@@ -97,6 +98,8 @@ class DB:
         except:
             raise Exception()
         
-    """    
-    def process_hire(self, job : job.Job, usher : usher.Usher):
-        job"""
+
+    """def process_hire(self, job : job.Job, usher : usher.Usher):
+        try:
+            json.dumps(usher)
+            self.update(job, )"""

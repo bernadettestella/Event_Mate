@@ -130,7 +130,7 @@ def user(user_type, user_id):
       except:
          return abort(400)
    try:
-      user = AUTH.db.searchitem(models.get(user_type), id=user_id)
+      user = AUTH.db.searchUser(models.get(user_type), id=user_id)
       return jsonify({"user" : user.id})
    except NoResultFound:
       return jsonify({"err" : "No result found"})
@@ -210,14 +210,14 @@ def postjob():
    except:
       abort(400)
    
-"""@app.route("/hire/<usher_id>/<job_id>")
+@app.route("/hire/<usher_id>/<job_id>")
 @login_required
 def hire(usher_id, job_id):
    try:
       AUTH.hire(usher_id, job_id)
       return jsonify({"status": "ok"})
    except:
-      abort(400)"""
+      abort(400)
 
 @app.route("/update/<user_type>/<user_id>")
 @login_required

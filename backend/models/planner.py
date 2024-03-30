@@ -25,6 +25,8 @@ class Planner(BASE, UserMixin):
     job_description = Column(String(250), unique=True)
     loaction = Column(String(250), nullable=True)
     phone = Column(Integer, unique=True)
+    _rand_auth = Column(String(250), default="")
+
     
     def __init__(self):
         id = Planner.__uuid + str(uuid.uuid4())
