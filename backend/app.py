@@ -135,8 +135,8 @@ def user(user_type, user_id):
    except NoResultFound:
       return jsonify({"err" : "No result found"})
    
-@app.route('/forget-password', methods=["POST", "GET"])
-def forget_password():
+@app.route('/forgot-password', methods=["POST", "GET"])
+def forgot_password():
    email = request.args.get('email')
    
    user = AUTH.db.searchitem(planner.Planner, email=email)
