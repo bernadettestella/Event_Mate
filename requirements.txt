@@ -5,3 +5,5 @@ flask_login
 wtforms
 flask_bcrypt
 flask_wtf
+flask-mail
+flask_jwt_extended
