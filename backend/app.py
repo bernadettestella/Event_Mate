@@ -7,6 +7,7 @@ from typing import Union
 from flask_mail import Mail, Message
 from flask_jwt_extended import JWTManager, create_access_token, decode_token
 import datetime
+import random
 
 
 app = Flask(__name__)
@@ -134,65 +135,53 @@ def user(user_type, user_id):
       return jsonify({"user" : user.id})
    except NoResultFound:
       return jsonify({"err" : "No result found"})
-   
+
 @app.route('/forgot-password', methods=["POST", "GET"])
 def forgot_password():
    email = request.args.get('email')
-   
-   user = AUTH.db.searchitem(planner.Planner, email=email)
-   
-   if user is not None:
-      return jsonify(user.get_data())
-   
    try:
-      user = AUTH.db.searchitem(usher.Usher, email=email)
-      
-   except NoResultFound:
-      expires = datetime.timedelta(days=1)
-      reset_token = jwt.encode(
-         {'email': email, 'exp': datetime.datetime.utcnow() + expires},
-      )
-   
-      if user is not None:
-         return jsonify(user.get_data())
-      
-      expires = datetime.timedelta(days=1)
-      reset_token = jwt.encode(
-         {'email': email, 'exp': datetime.datetime.utcnow() + expires},
-      )
-      
-      
-      msg = Message('Password Reset Request', sender = 'kRkFQ@example.com', recipients = [email])
-      msg.body = f"To reset your password, visit the following link: {reset_token}"
-      mail.send(msg)
-      
-      return jsonify({"message": "Password reset email sent"}), 200
-
-   else:
-      return jsonify({"error": "User not found"})
-
-@app.route('/reset-password/<token>', methods=['POST'])
-def reset_password(token):
-   new_password = request.json.get('new_password')
-   
-   try:
-      user_id = decode_token(token)['identity']
-      confirm_user = AUTH.search_specific_table("planner", id=user_id)
-      if confirm_user is None:
-         confirm_user = AUTH.search_specific_table("usher", id=user_id)
-         
-   
       try:
-            
-         AUTH.update_item("planner",user_id, new_password)
-      except: 
-         AUTH.update_item("usher",user_id, new_password)
-         
-      return jsonify({"message": "Password updated successfully"}), 200
-   except jwt.ExpiredSignatureError:
-      return jsonify({"message": "Password reset token has expired"}), 400
-   except jwt.InvalidTokenError:
-      return jsonify({"message": "Invalid password reset token"}), 400
+         print("SEARCHING PLANNER...........................")
+         user = AUTH.db.searchitem(planner.Planner, email=email)
+         token = random.randbytes(6).hex()
+         updated_user = AUTH.update_item("planner", user.id, _rand_auth=token)
+         return jsonify({"token": updated_user._rand_auth})
+      except:
+         try:
+            print("SEARCHING USHER........................")
+            user = AUTH.db.searchitem(usher.Usher, email=email)
+            token = random.randbytes(6).hex()
+            updated_user = AUTH.update_item("usher", user.id, _rand_auth=token)
+            return jsonify({"token": updated_user._rand_auth})
+         except:
+            return jsonify({"error": "User not found"})
+   except:
+      return abort(400)
+
+
+@app.route('/reset-password/<token>', methods=['POST', 'GET'])
+def reset_password(token):
+   email = request.args.get('email')
+   new_password = request.args.get("new_password")
+   try:
+      try:
+         user = AUTH.db.searchitem(planner.Planner, email=email)
+         if token == user._rand_auth:
+            hashed_password = bcrypt.generate_password_hash(new_password)
+            AUTH.update_item("planner", user.id, password=hashed_password)
+            return jsonify({"status" : "ok"})
+         else:
+            return jsonify({"err": "Invalid Token"})
+      except:
+         user = AUTH.db.searchitem(usher.Usher, email=email)
+         if token == user._rand_auth:
+            hashed_password = bcrypt.generate_password_hash(new_password)
+            AUTH.update_item("usher", user.id, password=hashed_password)
+            return jsonify({"status" : "ok"})
+         else:
+            return jsonify({"err": "Invalid Token"})
+   except:
+      return abort(400)
 
    
 @app.route("/postjob", methods=["GET", "POST"])
@@ -214,8 +203,8 @@ def postjob():
 @login_required
 def hire(usher_id, job_id):
    try:
-      AUTH.hire(usher_id, job_id)
-      return jsonify({"status": "ok"})
+      job = AUTH.hire(usher_id, job_id)
+      return jsonify({"status": job.hired_ushers})
    except:
       abort(400)
 

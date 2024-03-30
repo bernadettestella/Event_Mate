@@ -40,7 +40,12 @@ class Usher(BASE, UserMixin):
             "id" : self.id,
             "email": self.email,
             "username" : self.username,
-            "session_id" : self.session_id,
-            "job" : self.job
-
+            "height" : self.height,
+            "age" : self.age,
+            "state" : self.state,
+            "town" : self.town,
+            "gender" : self.gender,
+            "first name" : self.firstname,
+            "last name" : self.lastname,
+            "phone" : self.phone,
             }

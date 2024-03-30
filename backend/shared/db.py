@@ -98,8 +98,22 @@ class DB:
         except:
             raise Exception()
         
-
-    """def process_hire(self, job : job.Job, usher : usher.Usher):
+    """def save_hire(self, job : job.Job, json_str:str):
+        """
+    def process_hire(self, job : job.Job, usher : usher.Usher):
         try:
-            json.dumps(usher)
-            self.update(job, )"""
+            list_of_ushers : List[str] = []
+            if job.hired_ushers is None:
+                js_object = json.dumps(usher.get_data())
+                list_of_ushers.append(js_object)
+            else:
+                #deserialize job.hired_ushers()
+                ushers : List = json.loads(job.hired_ushers)
+                for usher_ in ushers:
+                    list_of_ushers.append(usher_)
+            job.hired_ushers(json.dumps(list_of_ushers))
+            self._session.add(job)
+            self._session.commit()
+            return job
+        except BaseException as e:
+            print("THERE HAS BEEN AN ERROR {}".format(e.args))

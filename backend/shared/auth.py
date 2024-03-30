@@ -80,7 +80,8 @@ class Auth:
         if job == None or usher == None:
             raise Exception("Invalid Job or Usher Id")
         try:
-            self.db.process_hire(job, usher)
+            updated_job = self.db.process_hire(job, usher)
+            return updated_job
         except:
             raise Exception("Error Adding Usher To Job")
     
