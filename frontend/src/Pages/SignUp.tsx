@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
@@ -17,6 +16,9 @@ const BackgroundSection = styled.div`
   height: 100vh;
   margin: 0;
   padding: 0;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const Container = styled.div`
@@ -29,6 +31,9 @@ const FormContainer = styled.div`
   background: #fff;
   padding:2%;
   border: 0.5px solid #ccc;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const FormGroup = styled.div`
@@ -79,8 +84,12 @@ const SignInLink = styled.a`
   text-decoration: underline;
 `;
 
-const SignUpForm = () => {
-  // State for form data and error message
+interface Country {
+  mobileCode: string;
+  // Add other properties as needed
+}
+
+  const SignUpForm = () => {
   const [signUpData, setSignUpData] = useState({
     email: '',
     firstName: '',
@@ -94,14 +103,13 @@ const SignUpForm = () => {
     phone: '',
   });
   const [message, setMessage] = useState('');
-  const [errors, setErrors] = useState({}); // State for validation errors
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [phoneNumber, setPhoneNumber] = useState('');
 
-  // Function to handle input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const { name, value } = e.target;
     if (name === 'phone') {
-      // Format the phone number using libphonenumber-js
-      const formattedPhoneNumber = new AsYouType().input(value);
+    const formattedPhoneNumber = new AsYouType().input(value);
       setSignUpData({ ...signUpData, [name]: formattedPhoneNumber });
     } else {
       setSignUpData({ ...signUpData, [name]: value });
@@ -109,20 +117,14 @@ const SignUpForm = () => {
     setErrors({ ...errors, [name]: '' });
   };
 
-  // State for phone number and selected country mobile code
-  const [phoneNumber, setPhoneNumber] = useState('');
-
-  // Callback function for handling country selection
-  const handleCountrySelect = (selectedCountry) => {
-    setPhoneNumber(selectedCountry.mobileCode);
+  const handleCountrySelect = (selectedCountry: Country) => {
+    setSignUpData({ ...signUpData, country: selectedCountry.mobileCode });
   };
 
-  // Function to handle form submission
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Validate form fields
-    const validationErrors = {};
+    const validationErrors: Record<string, string> = {};
     if (!signUpData.email || !signUpData.email.includes('@')) {
       validationErrors.email = 'Please enter a valid email address.';
     }
@@ -134,7 +136,6 @@ const SignUpForm = () => {
     }
     setErrors(validationErrors);
 
-    // Check if there are any validation errors
     if (Object.keys(validationErrors).length === 0) {
       try {
         const response = await axios.post('/register', signUpData);
@@ -145,7 +146,6 @@ const SignUpForm = () => {
     }
   };
 
-  // Form component with input fields and submit button
   return (
     <BackgroundSection>
       <Container>
@@ -211,13 +211,13 @@ const SignUpForm = () => {
               {errors.confirmPassword && <ErrorMessage>{errors.confirmPassword}</ErrorMessage>}
             </FormGroup>
             <FormGroup>
-              <Label htmlFor="age">Age:</Label>
               <Input
                 type="number"
                 id="age"
                 name="age"
                 value={signUpData.age}
                 onChange={handleChange}
+                placeholder={`Enter your Age`}
                 required
               />
               <Label htmlFor="gender">Gender:</Label>
