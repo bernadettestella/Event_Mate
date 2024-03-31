@@ -18,7 +18,7 @@ const NavLinks = styled.div`
 	color: #fff;
 	justify-content: space-between;
 	gap: 3em;
-	font-weight: 600;
+	font-weight: 500;
 	cursor: pointer;
 `;
 

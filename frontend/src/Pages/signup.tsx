@@ -97,48 +97,42 @@ const SignUpForm = () => {
   const [errors, setErrors] = useState({}); // State for validation errors
 
   // Function to handle input change
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setSignUpData({ ...signUpData, [e.target.name]: e.target.value });
-  };
-
-  // State for phone number and selected country mobile code
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [selectedCountryMobileCode, setSelectedCountryMobileCode] = useState<string>('+44');
-
-  // Callback function for handling country selection
-  const handleCountrySelect = (selectedCountry: any) => {
-    setSelectedCountryMobileCode(selectedCountry.mobileCode);
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === 'phone') {
       // Format the phone number using libphonenumber-js
       const formattedPhoneNumber = new AsYouType().input(value);
-      setPhoneNumber(formattedPhoneNumber);
+      setSignUpData({ ...signUpData, [name]: formattedPhoneNumber });
     } else {
       setSignUpData({ ...signUpData, [name]: value });
     }
-    // Clear validation error for the field being edited
     setErrors({ ...errors, [name]: '' });
   };
 
+  // State for phone number and selected country mobile code
+  const [phoneNumber, setPhoneNumber] = useState('');
+
+  // Callback function for handling country selection
+  const handleCountrySelect = (selectedCountry) => {
+    setPhoneNumber(selectedCountry.mobileCode);
+  };
+
   // Function to handle form submission
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-  // Validate form fields
-  const validationErrors = {};
-  if (!signUpData.email || !signUpData.email.includes('@')) {
-    validationErrors.email = 'Please enter a valid email address.';
-  }
-  if (!signUpData.password) {
-    validationErrors.password = 'Please enter a password.';
-  }
-  if (signUpData.password !== signUpData.confirmPassword) {
-    validationErrors.confirmPassword = 'Passwords do not match.';
-  }
-  setErrors(validationErrors);
+    // Validate form fields
+    const validationErrors = {};
+    if (!signUpData.email || !signUpData.email.includes('@')) {
+      validationErrors.email = 'Please enter a valid email address.';
+    }
+    if (!signUpData.password) {
+      validationErrors.password = 'Please enter a password.';
+    }
+    if (signUpData.password !== signUpData.confirmPassword) {
+      validationErrors.confirmPassword = 'Passwords do not match.';
+    }
+    setErrors(validationErrors);
 
     // Check if there are any validation errors
     if (Object.keys(validationErrors).length === 0) {
@@ -160,7 +154,8 @@ const SignUpForm = () => {
           {message && <ErrorMessage>{message}</ErrorMessage>}
           <form onSubmit={handleSubmit}>
             {/* Input fields */}
-            <Label htmlFor="email">Email Address:</Label>
+            <FormGroup>
+              <Label htmlFor="email">Email Address:</Label>
               <Input
                 type="email"
                 id="email"
@@ -249,7 +244,7 @@ const SignUpForm = () => {
               />
             </FormGroup>
             <FormGroup>
-            <CountrySelector onCountrySelect={handleCountrySelect} />
+              <CountrySelector onCountrySelect={handleCountrySelect} />
             </FormGroup>
             <FormGroup>
               <Input
@@ -258,7 +253,7 @@ const SignUpForm = () => {
                 name="phone"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder={`Enter your phone number ${selectedCountryMobileCode}`}
+                placeholder={`Enter your phone number`}
                 required
               />
             </FormGroup>
@@ -276,4 +271,3 @@ const SignUpForm = () => {
 };
 
 export default SignUpForm;
-
