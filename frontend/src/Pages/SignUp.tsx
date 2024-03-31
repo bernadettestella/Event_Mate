@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 import CountrySelector from '../Components/Country';
+import { AsYouType } from 'libphonenumber-js';
 
 import backgroundImage from '../assets/background.jpg';
 
@@ -85,6 +86,7 @@ const SignUpForm = () => {
     firstName: '',
     lastName: '',
     password: '',
+    confirmPassword: '',
     age: '',
     gender: '',
     height: '',
@@ -92,31 +94,54 @@ const SignUpForm = () => {
     phone: '',
   });
   const [message, setMessage] = useState('');
+  const [errors, setErrors] = useState({}); // State for validation errors
 
   // Function to handle input change
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setSignUpData({ ...signUpData, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'phone') {
+      // Format the phone number using libphonenumber-js
+      const formattedPhoneNumber = new AsYouType().input(value);
+      setSignUpData({ ...signUpData, [name]: formattedPhoneNumber });
+    } else {
+      setSignUpData({ ...signUpData, [name]: value });
+    }
+    setErrors({ ...errors, [name]: '' });
   };
 
   // State for phone number and selected country mobile code
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [selectedCountryMobileCode, setSelectedCountryMobileCode] = useState<string>('+44');
 
   // Callback function for handling country selection
-  const handleCountrySelect = (selectedCountry: any) => {
-    setSelectedCountryMobileCode(selectedCountry.mobileCode);
+  const handleCountrySelect = (selectedCountry) => {
+    setPhoneNumber(selectedCountry.mobileCode);
   };
 
   // Function to handle form submission
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post('/register', signUpData);
-      // Handle successful registration
-      console.log(response.data);
-    } catch (error) {
-      // Handle registration error
-      console.error(error);
+
+    // Validate form fields
+    const validationErrors = {};
+    if (!signUpData.email || !signUpData.email.includes('@')) {
+      validationErrors.email = 'Please enter a valid email address.';
+    }
+    if (!signUpData.password) {
+      validationErrors.password = 'Please enter a password.';
+    }
+    if (signUpData.password !== signUpData.confirmPassword) {
+      validationErrors.confirmPassword = 'Passwords do not match.';
+    }
+    setErrors(validationErrors);
+
+    // Check if there are any validation errors
+    if (Object.keys(validationErrors).length === 0) {
+      try {
+        const response = await axios.post('/register', signUpData);
+        console.log(response.data);
+      } catch (error) {
+        setMessage('An error occurred during sign-up.');
+      }
     }
   };
 
@@ -139,6 +164,7 @@ const SignUpForm = () => {
                 onChange={handleChange}
                 required
               />
+              {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
             </FormGroup>
             <FormGroup>
               <Label htmlFor="firstName">First Name:</Label>
@@ -170,6 +196,19 @@ const SignUpForm = () => {
                 onChange={handleChange}
                 required
               />
+              {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="confirmPassword">Confirm Password:</Label>
+              <Input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                value={signUpData.confirmPassword}
+                onChange={handleChange}
+                required
+              />
+              {errors.confirmPassword && <ErrorMessage>{errors.confirmPassword}</ErrorMessage>}
             </FormGroup>
             <FormGroup>
               <Label htmlFor="age">Age:</Label>
@@ -205,17 +244,16 @@ const SignUpForm = () => {
               />
             </FormGroup>
             <FormGroup>
-            <CountrySelector onCountrySelect={handleCountrySelect} />
+              <CountrySelector onCountrySelect={handleCountrySelect} />
             </FormGroup>
             <FormGroup>
-
               <Input
                 type="text"
                 id="phone"
                 name="phone"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder={`Enter your phone number ${selectedCountryMobileCode}`}
+                placeholder={`Enter your phone number`}
                 required
               />
             </FormGroup>
@@ -233,4 +271,3 @@ const SignUpForm = () => {
 };
 
 export default SignUpForm;
-
