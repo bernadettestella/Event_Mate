@@ -1,14 +1,31 @@
 from flask import Flask, abort, flash, jsonify, redirect, request, render_template, url_for
 from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, login_required, login_user, logout_user
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from sqlalchemy.exc import NoResultFound
 from shared.auth import Auth, usher, planner
 from typing import Union
+from flask_mail import Mail, Message
+from flask_jwt_extended import JWTManager, create_access_token, decode_token
+import datetime
+import random
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'df02efcafd88339a979746fe'
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'k1b5M@example.com'
+app.config['MAIL_PASSWORD'] = 'yourpassword'
+app.config["JWT_SECRET_KEY"] = "super-secret"
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(hours=1)
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = datetime.timedelta(days=30)
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+
+
 bcrypt = Bcrypt(app)
+mail = Mail(app)
+jwt = JWTManager(app)
 
 
 AUTH = Auth()
@@ -21,12 +38,12 @@ login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(user_id: str) -> Union[None, usher.Usher, planner.Planner]:
     try:
-       user = AUTH.db.searchUser(usher.Usher, id=user_id)
+       user = AUTH.db.searchitem(usher.Usher, id=user_id)
        print("trying.....................usher")
        return user
     except NoResultFound:
        try:
-          user = AUTH.db.searchUser(planner.Planner, id=user_id)
+          user = AUTH.db.searchitem(planner.Planner, id=user_id)
           print("trying.....................planner")
           return user
        except NoResultFound:
@@ -86,7 +103,8 @@ def login():
 @app.route('/dashboard', strict_slashes=False, methods=['GET', 'POST'])
 @login_required
 def dashboard():
-   return jsonify({"user": request.blueprint})
+   user : Union[usher.Usher | planner.Planner] = current_user
+   return jsonify({"user": user.username})
 
 
 @app.route("/users/<user_type>", methods=["GET"])
@@ -118,7 +136,88 @@ def user(user_type, user_id):
    except NoResultFound:
       return jsonify({"err" : "No result found"})
 
+@app.route('/forgot-password', methods=["POST", "GET"])
+def forgot_password():
+   email = request.args.get('email')
+   try:
+      try:
+         print("SEARCHING PLANNER...........................")
+         user = AUTH.db.searchitem(planner.Planner, email=email)
+         token = random.randbytes(6).hex()
+         updated_user = AUTH.update_item("planner", user.id, _rand_auth=token)
+         return jsonify({"token": updated_user._rand_auth})
+      except:
+         try:
+            print("SEARCHING USHER........................")
+            user = AUTH.db.searchitem(usher.Usher, email=email)
+            token = random.randbytes(6).hex()
+            updated_user = AUTH.update_item("usher", user.id, _rand_auth=token)
+            return jsonify({"token": updated_user._rand_auth})
+         except:
+            return jsonify({"error": "User not found"})
+   except:
+      return abort(400)
 
+
+@app.route('/reset-password/<token>', methods=['POST', 'GET'])
+def reset_password(token):
+   email = request.args.get('email')
+   new_password = request.args.get("new_password")
+   try:
+      try:
+         user = AUTH.db.searchitem(planner.Planner, email=email)
+         if token == user._rand_auth:
+            hashed_password = bcrypt.generate_password_hash(new_password)
+            AUTH.update_item("planner", user.id, password=hashed_password)
+            return jsonify({"status" : "ok"})
+         else:
+            return jsonify({"err": "Invalid Token"})
+      except:
+         user = AUTH.db.searchitem(usher.Usher, email=email)
+         if token == user._rand_auth:
+            hashed_password = bcrypt.generate_password_hash(new_password)
+            AUTH.update_item("usher", user.id, password=hashed_password)
+            return jsonify({"status" : "ok"})
+         else:
+            return jsonify({"err": "Invalid Token"})
+   except:
+      return abort(400)
+
+   
+@app.route("/postjob", methods=["GET", "POST"])
+@login_required
+def postjob():
+   # ensure all forms fields are collected using request.form.get() and passed as
+   # second arguments to the AUTH.search_secific_table() function below
+   user = current_user
+   confirmed_user = AUTH.search_specific_table("planner", id=user.id)
+   if confirmed_user is None:
+      abort(400)
+   try:
+      AUTH.db.postjob(confirmed_user.id, job_amount=2000)
+      return jsonify({"status" : "ok"})
+   except:
+      abort(400)
+   
+@app.route("/hire/<usher_id>/<job_id>")
+@login_required
+def hire(usher_id, job_id):
+   try:
+      job = AUTH.hire(usher_id, job_id)
+      return jsonify({"status": job.hired_ushers})
+   except:
+      abort(400)
+
+@app.route("/update/<user_type>/<user_id>")
+@login_required
+def update_user(user_type, user_id):
+   try:
+      updated_user = AUTH.update_item(user_type, user_id, email="bernadettestella27@gmail.com")
+      return jsonify({"status" : "ok", "response" : updated_user.age})
+   except:
+      abort(400)
+   
+   
 @app.route('/logout', methods=['GET','POST'])
 def logout():
   logout_user()

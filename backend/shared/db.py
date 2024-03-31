@@ -1,8 +1,9 @@
+import json
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 from shared import BASE
-from models import usher, planner
+from models import usher, planner, job
 from sqlalchemy.exc import InvalidRequestError, NoResultFound
 from typing import Union, List
 
@@ -38,8 +39,8 @@ class DB:
             user = None
         return user
 
-    def searchUser(self, db_table: Union[usher.Usher, planner.Planner], **kwargs):
-        "finds a user in DB"
+    def searchitem(self, db_table: Union[usher.Usher, planner.Planner, job.Job], **kwargs) -> Union[usher.Usher, planner.Planner, job.Job]:
+        "finds an item in DB"
         keys = []
         for key, val in kwargs.items():
             if hasattr(db_table, key):
@@ -70,3 +71,49 @@ class DB:
         for items in values:
             mylist.append(items.id)
         return mylist
+    
+    def postjob(self, poster_id, **kwargs):
+        job_instance = job.Job()
+        try:
+            job_instance.id = poster_id
+            for key, item in kwargs.items():
+                if hasattr(job_instance, key):
+                    job_instance.__setattr__(key, item)
+            self._session.add(job_instance)
+            self._session.commit()
+        except:
+            self._session.rollback()
+            raise Exception("ERROR ADDING JOB TO DB")
+        
+    def update(self, model : Union[usher.Usher, planner.Planner, job.Job], items:dict):
+        for key, val in items.items():
+            if key == "id" or key == "db_id":
+                continue
+            if hasattr(model, key):
+                model.__setattr__(key, val)
+        try:
+            self._session.add(model)
+            self._session.commit()
+            return model
+        except:
+            raise Exception()
+        
+    """def save_hire(self, job : job.Job, json_str:str):
+        """
+    def process_hire(self, job : job.Job, usher : usher.Usher):
+        try:
+            list_of_ushers : List[str] = []
+            if job.hired_ushers is None:
+                js_object = json.dumps(usher.get_data())
+                list_of_ushers.append(js_object)
+            else:
+                #deserialize job.hired_ushers()
+                ushers : List = json.loads(job.hired_ushers)
+                for usher_ in ushers:
+                    list_of_ushers.append(usher_)
+            job.hired_ushers(json.dumps(list_of_ushers))
+            self._session.add(job)
+            self._session.commit()
+            return job
+        except BaseException as e:
+            print("THERE HAS BEEN AN ERROR {}".format(e.args))

@@ -1,9 +1,10 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Text
 from shared import BASE
 from flask_login import UserMixin
 import random
 import uuid
 from urllib.parse import quote
+import json
 
 
 
@@ -27,6 +28,8 @@ class Usher(BASE, UserMixin):
     town = Column(String(250), nullable=True)
     state = Column(String(250), nullable=True)
     phone = Column(Integer, unique=True)
+    _rand_auth = Column(String(250), default="")
+    job = Column(Text)
     
     def __init__(self):
         id = Usher.__uuid + str(uuid.uuid4())
@@ -37,6 +40,12 @@ class Usher(BASE, UserMixin):
             "id" : self.id,
             "email": self.email,
             "username" : self.username,
-            "session_id" : self.session_id,
-            "jobs": []
+            "height" : self.height,
+            "age" : self.age,
+            "state" : self.state,
+            "town" : self.town,
+            "gender" : self.gender,
+            "first name" : self.firstname,
+            "last name" : self.lastname,
+            "phone" : self.phone,
             }
