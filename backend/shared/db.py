@@ -75,12 +75,13 @@ class DB:
     def postjob(self, poster_id, **kwargs):
         job_instance = job.Job()
         try:
-            job_instance.id = poster_id
+            job_instance.planner_id = poster_id
             for key, item in kwargs.items():
                 if hasattr(job_instance, key):
                     job_instance.__setattr__(key, item)
             self._session.add(job_instance)
             self._session.commit()
+            return job_instance
         except:
             self._session.rollback()
             raise Exception("ERROR ADDING JOB TO DB")
@@ -104,16 +105,17 @@ class DB:
         try:
             list_of_ushers : List[str] = []
             if job.hired_ushers is None:
-                js_object = json.dumps(usher.get_data())
-                list_of_ushers.append(js_object)
+                print("job is None................!!!!!!!!")
+                list_of_ushers.append(usher.get_data())
+                print(len(list_of_ushers))
             else:
                 #deserialize job.hired_ushers()
                 ushers : List = json.loads(job.hired_ushers)
                 for usher_ in ushers:
                     list_of_ushers.append(usher_)
-            job.hired_ushers(json.dumps(list_of_ushers))
+            job.hired_ushers = json.dumps(list_of_ushers)
             self._session.add(job)
             self._session.commit()
-            return job
+            return json.loads(job.hired_ushers)
         except BaseException as e:
             print("THERE HAS BEEN AN ERROR {}".format(e.args))

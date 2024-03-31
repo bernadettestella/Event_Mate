@@ -194,8 +194,8 @@ def postjob():
    if confirmed_user is None:
       abort(400)
    try:
-      AUTH.db.postjob(confirmed_user.id, job_amount=2000)
-      return jsonify({"status" : "ok"})
+      job = AUTH.db.postjob(confirmed_user.id, job_amount=2000)
+      return jsonify({"status" : job.db_id})
    except:
       abort(400)
    
@@ -204,7 +204,7 @@ def postjob():
 def hire(usher_id, job_id):
    try:
       job = AUTH.hire(usher_id, job_id)
-      return jsonify({"status": job.hired_ushers})
+      return jsonify({"status": job})
    except:
       abort(400)
 
@@ -225,4 +225,4 @@ def logout():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="5000")
+    app.run(host="0.0.0.0", port="5000", debug=True)

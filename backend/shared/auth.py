@@ -57,8 +57,11 @@ class Auth:
             if hasattr(table, key) is False:
                 return None
         try:
+            if table_to_search == "job":
+                result = self.db.searchitem(table, db_id=kwargs.get("db_id"))
+            else:
                 result = self.db.searchitem(table, id=kwargs.get("id"))
-                return result
+            return result
         except:
             return None
 
@@ -75,7 +78,7 @@ class Auth:
 
         
     def hire(self, usher_id, job_id):
-        job = self.search_specific_table("job", id=job_id)
+        job = self.search_specific_table("job", db_id=job_id)
         usher = self.search_specific_table("usher", id=usher_id)
         if job == None or usher == None:
             raise Exception("Invalid Job or Usher Id")
@@ -84,4 +87,3 @@ class Auth:
             return updated_job
         except:
             raise Exception("Error Adding Usher To Job")
-    

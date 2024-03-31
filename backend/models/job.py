@@ -13,7 +13,7 @@ class Job(BASE):
     __uniqueId = random.randbytes(20).hex()
     
     db_id = Column(String(250), primary_key=True, unique=True)
-    id = Column(String(250), nullable=False)
+    planner_id = Column(String(250), nullable=False)
     job_description = Column(String(250), nullable=True)
     job_amount = Column(Integer, nullable=False)
     hired_ushers = Column(Text, nullable=True)
