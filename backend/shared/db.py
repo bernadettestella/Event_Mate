@@ -69,10 +69,10 @@ class DB:
         values = self._session.query(user).filter(user.id != None).all()
         mylist = []
         for items in values:
-            mylist.append(items.id)
+            mylist.append(items.username)
         return mylist
     
-    def postjob(self, poster_id, **kwargs):
+    def postjob(self, poster_id, kwargs:dict):
         job_instance = job.Job()
         try:
             job_instance.planner_id = poster_id

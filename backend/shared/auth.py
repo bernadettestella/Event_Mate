@@ -66,7 +66,7 @@ class Auth:
             return None
 
 
-    def update_item(self, table_to_update:str, item_id_to_update:str, **kwargs):
+    def update_item(self, table_to_update:str, item_id_to_update:str, kwargs:dict):
         result = self.search_specific_table(table_to_update, id=item_id_to_update)
         if result is None:
             raise Exception("INVALID ID")
