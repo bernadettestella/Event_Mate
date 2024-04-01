@@ -54,8 +54,7 @@ export const CreateAccount = styled.div`
 `;
 
 export const Input = styled.input`
-  margin-bottom: 10%;
-  padding: 15px;
+  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
   spacing: 4px;

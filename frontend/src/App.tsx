@@ -6,9 +6,11 @@ import Input from './Components/Input';
 import SignUpForm from './Pages/SignUp';
 import EventPlannerForm from './Pages/EventPlanner';
 import ForgotPasswordForm from './Pages/ForgotPass';
+import UsherDashboard from './Pages/Dashboard';
 import { BackgroundSection, FormSection, FormContainer,SignIn, CreateAccount, ButtonContainer, Button, ForgotPasswordLink, SignInFooter, RememberMeLabel, TermsOfServiceLink } from './styles';
 
 import backgroundImage from './assets/background.jpg'; // Import your background image
+
 
 interface SignInData {
   email: string;
@@ -46,7 +48,7 @@ const SignInForm: React.FC = () => {
       // Assuming the backend returns a token upon successful login
       const token = response.data.token;
       // Redirect to user account page or perform any other action
-      window.location.href = '/Pages/Dashboard'; // Redirect to the account page
+      window.location.href = './Pages/Dashboard'; // Redirect to the account page
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const axiosError = error as any; // Use any type here
@@ -75,27 +77,25 @@ const SignInForm: React.FC = () => {
           <SignIn><h4>Sign In</h4></SignIn>
           {message && <p>{message}</p>}
           <form onSubmit={handleSubmit}>
+          <Input
+            type="email"
+            name="Email"
+            value={signInData.email}
+            onChange={handleChange}
+            placeholder="Email Address"
+            iconLeft={<FaUser />} // Provide the email user icon as the iconLeft prop
+            required
+          />
             <Input
-              type="email"
-              name="Email"
-              value={signInData.email}
-              onChange={handleChange}
-              placeholder="Email Address"
-              icon={<FaUser />} // User icon
-              required
-            />
-            <Input
-              type={showPassword ? 'text' : 'password'}
+             type={showPassword ? 'text' : 'password'}
               name="password"
               value={signInData.password}
               onChange={handleChange}
               placeholder="Password"
-              icon={<FaKey />} // Key icon
               required
-              autoComplete="current-password"
-              endIcon={showPassword ? <FaEyeSlash onClick={togglePasswordVisibility} /> : <FaEye onClick={togglePasswordVisibility} />} // Eye icon to toggle password visibility
+              iconLeft={<FaKey />}
+              iconRight={showPassword ? <FaEyeSlash onClick={togglePasswordVisibility} /> : <FaEye onClick={togglePasswordVisibility} />}
             />
-
             <SignInFooter>
               <RememberMeLabel>
                 <input
@@ -127,6 +127,7 @@ const App: React.FC = () => {
         <Route path="/Pages/SignUp" element={<SignUpForm />} />
         <Route path="/Pages/EventPlanner" element={< EventPlannerForm />} />
         <Route path="/Pages/ForgotPass" element={<ForgotPasswordForm />} />
+        <Route path="/Pages/Dashboard" element={< UsherDashboard />} />
       </Routes>
     </Router>
   );
