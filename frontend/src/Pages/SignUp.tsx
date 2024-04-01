@@ -154,11 +154,25 @@ const SignUpForm = () => {
 
   return (
     <BackgroundSection>
+      {isUsher && (
       <FormContainer>
-        <h2>Sign Up</h2>
+        <h2>Usher Sign Up</h2>
         {message && <ErrorMessage>{message}</ErrorMessage>}
-        <form onSubmit={handleSubmit}>
-          <FormGroup>
+        <ToggleContainer>
+          <ToggleLabel>
+            <input
+              type="checkbox"
+              checked={isUsher}
+              onChange={handleToggle}
+            />
+            {isUsher ? 'Usher' : 'Event Planner'}
+          </ToggleLabel>
+        </ToggleContainer>
+        {isUsher && (
+          <form onSubmit={handleSubmit}>
+            {/* Render Usher sign-up form */}
+            {/* Input fields */}
+            <FormGroup>
             <Input type="email" id="email" name="email" value={signUpData.email} onChange={handleChange}placeholder=" Email Adress" required />
             {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
           </FormGroup>
@@ -191,19 +205,17 @@ const SignUpForm = () => {
           <FormGroup>
             <Input type="text" id="phone" name="phone" value={signUpData.phone} onChange={handleChange} placeholder="Enter your phone number" required />
           </FormGroup>
-          <ToggleContainer>
-            <ToggleLabel>
-              <input type="checkbox" checked={isUsher} onChange={() => setIsUsher(!isUsher)} />
-              {isUsher ? 'Usher' : 'Event Planner'}
-            </ToggleLabel>
-          </ToggleContainer>
-          {!isUsher && <EventPlannerForm />} {/* Render Event Planner form if Event Planner is selected */}
           <FormGroup>
             <SignInLink href="/">Already have an account? Sign In</SignInLink>
             <Button type="submit">Sign Up</Button>
           </FormGroup>
-        </form>
-      </FormContainer>
+
+          </form>
+        )}
+        {!isUsher && <EventPlannerForm />} {/* Render Event Planner form if Event Planner is selected */}
+        </FormContainer>
+      )}
+      {!isUsher && <EventPlannerForm />}
     </BackgroundSection>
   );
 };

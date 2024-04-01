@@ -19,7 +19,7 @@ const BackgroundSection = styled.div`
 `;
 
 const FormContainer = styled.div`
-width: 30%;
+width: 35%;
   background: #fff;
   padding: 2%;
   justify-content: right;
@@ -32,12 +32,12 @@ width: 30%;
 `;
 
 const FormGroup = styled.div`
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
 `;
 
 const Label = styled.label`
   display: flex;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
 `;
 
 const Input = styled.input`
