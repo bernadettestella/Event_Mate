@@ -6,6 +6,7 @@ import { AsYouType } from 'libphonenumber-js';
 import EventPlannerForm from './EventPlanner';
 import backgroundImage from '../assets/background.jpg';
 import Button from '../Components/Button';
+const baseURL = 'http://localhost:5000/api';
 
 const BackgroundSection = styled.div`
   flex: 1;
@@ -144,8 +145,9 @@ const SignUpForm = () => {
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length === 0) {
       try {
-        const response = await axios.post('/register', signUpData);
+        const response = await axios.post('http://localhost:5000/register', signUpData); // Adjust the URL as per your backend setup
         console.log(response.data);
+        // Handle successful signup, e.g., redirect to login page
       } catch (error) {
         setMessage('An error occurred during sign-up.');
       }

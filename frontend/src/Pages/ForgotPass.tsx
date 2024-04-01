@@ -71,6 +71,7 @@ const ForgottenPasswordPage: React.FC = () => {
     }
   };
 
+
   return (
     <Container>
       <Form onSubmit={handleSubmit}>

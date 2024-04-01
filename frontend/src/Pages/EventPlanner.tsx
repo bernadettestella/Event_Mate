@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import backgroundImage from '../assets/background.jpg';
 import Button from '../Components/Button'; 
+const baseURL = 'http://localhost:5000/api';
 
 // Styled components for styling
 const BackgroundSection = styled.div`

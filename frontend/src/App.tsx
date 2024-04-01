@@ -11,7 +11,7 @@ import UsherDashboard from './Pages/Dashboard';
 import { BackgroundSection, FormSection, FormContainer,SignIn, CreateAccount, ButtonContainer, Button, ForgotPasswordLink, SignInFooter, RememberMeLabel, TermsOfServiceLink } from './styles';
 
 import backgroundImage from './assets/background.jpg'; // Import your background image
-
+const baseURL = 'http://localhost:5000/api'; // Update with your Flask backend URL
 
 interface SignInData {
   email: string;
@@ -42,15 +42,16 @@ const SignInForm: React.FC = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
+  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/login', signInData);
-      // Assuming the backend returns a token upon successful login
+      const response = await axios.post(`${baseURL}/login`, signInData); // Send login request to backend
       const token = response.data.token;
+      // Store token in local storage or session storage for future requests
+      localStorage.setItem('token', token); // Example: Storing token in local storage
       // Redirect to user account page or perform any other action
-      navigate('./Pages/Dashboard');
+      navigate('/Pages/Dashboard');
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const axiosError = error as any; // Use any type here

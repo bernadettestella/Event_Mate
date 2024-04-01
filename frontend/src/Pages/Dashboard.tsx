@@ -139,17 +139,45 @@ const UsherDashboard = () => {
   const handleFilterChange = (e) => {
     setFilterOption(e.target.value);
   };
-
   const handleProfilePictureChange = (e) => {
-    // Handle profile picture upload
     const file = e.target.files[0];
     // Send file to server and update profile picture
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+    axios.post('/api/upload-profile-picture', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    .then(response => {
+      // Handle success
+      console.log(response.data);
+    })
+    .catch(error => {
+      // Handle error
+      console.error('Error uploading profile picture:', error);
+    });
   };
 
   const handleProfileUpdate = (e) => {
     e.preventDefault();
-    // Handle profile update form submission
+    const updatedProfileData = {
+      firstName: // get first name value from form,
+      lastName: // get last name value from form,
+      email: // get email value from form,
+      // Add other fields as needed
+    };
+    axios.post('/api/update-profile', updatedProfileData)
+      .then(response => {
+        // Handle success
+        console.log(response.data);
+      })
+      .catch(error => {
+        // Handle error
+        console.error('Error updating profile:', error);
+      });
   };
+
 
   return (
     <DashboardContainer>
