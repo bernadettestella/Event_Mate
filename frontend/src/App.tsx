@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaKey, FaUser } from 'react-icons/fa'; // Import icons for show/hide password
 import Input from './Components/Input';
 import SignUpForm from './Pages/SignUp';
+import EventPlannerForm from './Pages/EventPlanner';
 import ForgotPasswordForm from './Pages/ForgotPass';
 import { BackgroundSection, FormSection, FormContainer,SignIn, CreateAccount, ButtonContainer, Button, ForgotPasswordLink, SignInFooter, RememberMeLabel, TermsOfServiceLink } from './styles';
 
@@ -124,6 +125,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<SignInForm />} />
         <Route path="/Pages/SignUp" element={<SignUpForm />} />
+        <Route path="/Pages/EventPlanner" element={< EventPlannerForm />} />
         <Route path="/Pages/ForgotPass" element={<ForgotPasswordForm />} />
       </Routes>
     </Router>
