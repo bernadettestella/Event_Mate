@@ -6,6 +6,7 @@ import { AsYouType } from 'libphonenumber-js';
 import EventPlannerForm from './EventPlanner';
 import backgroundImage from '../assets/background.jpg';
 import Button from '../Components/Button';
+
 const baseURL = 'http://localhost:5000/api';
 
 const BackgroundSection = styled.div`
@@ -21,13 +22,13 @@ const BackgroundSection = styled.div`
 `;
 
 const FormContainer = styled.div`
-width: 35%;
-background: #fff;
-padding:2%;
-border: 0.5px solid #ccc;
-@media (max-width: 768px) {
-  width: 100%;
-}
+  width: 35%;
+  background: #fff;
+  padding: 2%;
+  border: 0.5px solid #ccc;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const FormGroup = styled.div`
@@ -84,6 +85,7 @@ interface SignUpData {
   firstName: string;
   lastName: string;
   email: string;
+  username: string;
   password: string;
   confirmPassword: string;
   age: string;
@@ -95,12 +97,14 @@ interface SignUpData {
 
 const SignUpForm = () => {
   const [isUsher, setIsUsher] = useState(true);
+
   const handleToggle = () => {
     setIsUsher(!isUsher);
   };
 
   const [signUpData, setSignUpData] = useState<SignUpData>({
     email: '',
+    username: '',
     firstName: '',
     lastName: '',
     password: '',
@@ -136,6 +140,9 @@ const SignUpForm = () => {
     if (!signUpData.email || !signUpData.email.includes('@')) {
       validationErrors.email = 'Please enter a valid email address.';
     }
+    if (!signUpData.username) {
+      validationErrors.username = 'Please enter a username.';
+    }
     if (!signUpData.password) {
       validationErrors.password = 'Please enter a password.';
     }
@@ -145,7 +152,7 @@ const SignUpForm = () => {
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length === 0) {
       try {
-        const response = await axios.post('http://localhost:5000/register', signUpData); // Adjust the URL as per your backend setup
+        const response = await axios.post(`${baseURL}/register`, signUpData); // Adjust the URL as per your backend setup
         console.log(response.data);
         // Handle successful signup, e.g., redirect to login page
       } catch (error) {
@@ -157,64 +164,149 @@ const SignUpForm = () => {
   return (
     <BackgroundSection>
       {isUsher && (
-      <FormContainer>
-        <h2>Usher Sign Up</h2>
-        {message && <ErrorMessage>{message}</ErrorMessage>}
-        <ToggleContainer>
-          <ToggleLabel>
-            <input
-              type="checkbox"
-              checked={isUsher}
-              onChange={handleToggle}
-            />
-            {isUsher ? 'Usher' : 'Event Planner'}
-          </ToggleLabel>
-        </ToggleContainer>
-        {isUsher && (
-          <form onSubmit={handleSubmit}>
-            {/* Render Usher sign-up form */}
-            {/* Input fields */}
-            <FormGroup>
-            <Input type="email" id="email" name="email" value={signUpData.email} onChange={handleChange}placeholder=" Email Adress" required />
-            {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
-          </FormGroup>
-          <FormGroup>
-            <Input type="text" id="firstName" name="firstName" value={signUpData.firstName} onChange={handleChange} placeholder="First Name" required />
-            <Input type="text" id="lastName" name="lastName" value={signUpData.lastName} onChange={handleChange} placeholder="Last Name"required />
-          </FormGroup>
-          <FormGroup>
-            <Input type="password" id="password" name="password" value={signUpData.password} onChange={handleChange} placeholder="Enter Password" required />
-            {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
-          </FormGroup>
-          <FormGroup>
-            <Input type="password" id="confirmPassword" name="confirmPassword" value={signUpData.confirmPassword} onChange={handleChange} placeholder="Confirm Password" required/>
-            {errors.confirmPassword && <ErrorMessage>{errors.confirmPassword}</ErrorMessage>}
-          </FormGroup>
-          <FormGroup>
-            <Input type="number" id="age" name="age" value={signUpData.age} onChange={handleChange} placeholder="Enter your Age" required />
-            <Label htmlFor="gender">Gender:</Label>
-            <Select id="gender" name="gender" value={signUpData.gender} onChange={handleChange} required>
-              <option value="">Select</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </Select>
-            <Input type="text" id="height" name="height" value={signUpData.height} onChange={handleChange} placeholder="Enter your Height" required />
-          </FormGroup>
-          <FormGroup>
-            <CountrySelector onCountrySelect={handleCountrySelect} />
-          </FormGroup>
-          <FormGroup>
-            <Input type="text" id="phone" name="phone" value={signUpData.phone} onChange={handleChange} placeholder="Enter your phone number" required />
-          </FormGroup>
-          <FormGroup>
-            <SignInLink href="/">Already have an account? Sign In</SignInLink>
-            <Button type="submit">Sign Up</Button>
-          </FormGroup>
-
-          </form>
-        )}
-        {!isUsher && <EventPlannerForm />} {/* Render Event Planner form if Event Planner is selected */}
+        <FormContainer>
+          <h2>Usher Sign Up</h2>
+          {message && <ErrorMessage>{message}</ErrorMessage>}
+          <ToggleContainer>
+            <ToggleLabel>
+              <input
+                type="checkbox"
+                checked={isUsher}
+                onChange={handleToggle}
+              />
+              {isUsher ? 'Usher' : 'Event Planner'}
+            </ToggleLabel>
+          </ToggleContainer>
+          {isUsher && (
+            <form onSubmit={handleSubmit}>
+              <FormGroup>
+                <Input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={signUpData.email}
+                  onChange={handleChange}
+                  placeholder="Email Address"
+                  required
+                />
+                {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
+              </FormGroup>
+              <FormGroup>
+                <Input
+                  type="text"
+                  id="username"
+                  name="username"
+                  value={signUpData.username}
+                  onChange={handleChange}
+                  placeholder="Username"
+                  required
+                />
+                {errors.username && (
+                  <ErrorMessage>{errors.username}</ErrorMessage>
+                )}
+              </FormGroup>
+              <FormGroup>
+                <Input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={signUpData.firstName}
+                  onChange={handleChange}
+                  placeholder="First Name"
+                  required
+                />
+                <Input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={signUpData.lastName}
+                  onChange={handleChange}
+                  placeholder="Last Name"
+                  required
+                />
+              </FormGroup>
+              <FormGroup>
+                <Input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={signUpData.password}
+                  onChange={handleChange}
+                  placeholder="Enter Password"
+                  required
+                />
+                {errors.password && (
+                  <ErrorMessage>{errors.password}</ErrorMessage>
+                )}
+              </FormGroup>
+              <FormGroup>
+                <Input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  value={signUpData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Confirm Password"
+                  required
+                />
+                {errors.confirmPassword && (
+                  <ErrorMessage>{errors.confirmPassword}</ErrorMessage>
+                )}
+              </FormGroup>
+              <FormGroup>
+                <Input
+                  type="number"
+                  id="age"
+                  name="age"
+                  value={signUpData.age}
+                  onChange={handleChange}
+                  placeholder="Enter your Age"
+                  required
+                />
+                <Label htmlFor="gender">Gender:</Label>
+                <Select
+                  id="gender"
+                  name="gender"
+                  value={signUpData.gender}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </Select>
+                <Input
+                  type="text"
+                  id="height"
+                  name="height"
+                  value={signUpData.height}
+                  onChange={handleChange}
+                  placeholder="Enter your Height"
+                  required
+                />
+              </FormGroup>
+              <FormGroup>
+                <CountrySelector onCountrySelect={handleCountrySelect} />
+              </FormGroup>
+              <FormGroup>
+                <Input
+                  type="text"
+                  id="phone"
+                  name="phone"
+                  value={signUpData.phone}
+                  onChange={handleChange}
+                  placeholder="Enter your phone number"
+                  required
+                />
+              </FormGroup>
+              <FormGroup>
+                <SignInLink href="/">Already have an account? Sign In</SignInLink>
+                <Button type="submit">Sign Up</Button>
+              </FormGroup>
+            </form>
+          )}
+          {!isUsher && <EventPlannerForm />}
         </FormContainer>
       )}
       {!isUsher && <EventPlannerForm />}

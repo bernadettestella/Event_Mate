@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const InputContainer = styled.div`
@@ -45,6 +45,8 @@ const Input: React.FC<InputProps> = ({
   iconLeft,
   iconRight,
 }) => {
+  const [showPassword, setShowPassword] = useState<boolean>(false); // State to toggle password visibility
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -53,7 +55,7 @@ const Input: React.FC<InputProps> = ({
     <InputContainer>
       {iconLeft && <Icon position="left">{iconLeft}</Icon>}
       <StyledInput
-        type={type}
+        type={type === 'password' && showPassword ? 'text' : type} // Toggle password visibility
         name={name}
         value={value}
         onChange={onChange}
@@ -61,7 +63,7 @@ const Input: React.FC<InputProps> = ({
         required={required}
         hasIcon={!!iconLeft || !!iconRight} // Check if any icon is present
       />
-      {iconRight && (
+      {type === 'password' && iconRight && (
         <Icon position="right" onClick={togglePasswordVisibility}>
           {iconRight}
         </Icon>

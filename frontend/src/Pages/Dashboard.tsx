@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom'; 
 
 const DashboardContainer = styled.div`
   padding: 20px;
@@ -33,17 +34,6 @@ const EventCard = styled.div`
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
-`;
-
-const JobNotificationIcon = styled.div`
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background-color: #007bff;
-  color: #fff;
-  padding: 10px;
-  border-radius: 50%;
-  cursor: pointer;
 `;
 
 const ProfilePictureUpload = styled.input`
@@ -82,8 +72,24 @@ const ProfileUpdateButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
 `;
+const LogoutButton = styled.button`
+  padding: 8px 12px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+`;
 
 const UsherDashboard = () => {
+  const navigate = useNavigate();  // Initialize useHistory hook
+
+  const handleLogout = () => {
+    // Clear authentication token (remove from local storage, for example)
+    localStorage.removeItem('token');
+    // Redirect user to login page
+    history.push('/login');
+  };
   const [ushers, setUshers] = useState([]);
   const [filteredUshers, setFilteredUshers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -162,9 +168,9 @@ const UsherDashboard = () => {
   const handleProfileUpdate = (e) => {
     e.preventDefault();
     const updatedProfileData = {
-      firstName: // get first name value from form,
-      lastName: // get last name value from form,
-      email: // get email value from form,
+      firstName: e.target.elements.firstName.value,
+      lastName: e.target.elements.lastName.value,
+      email: e.target.elements.email.value,
       // Add other fields as needed
     };
     axios.post('/api/update-profile', updatedProfileData)
@@ -204,12 +210,11 @@ const UsherDashboard = () => {
       {events.map(event => (
         <EventCard key={event.id}>
           <h3>{event.name}</h3>
-          {/* Display other event information here */}
+          <p>Date: {event.date}</p>
+          <p>Location: {event.location}</p>
+          <button>Apply</button> {/* Button to apply for the event */}
         </EventCard>
       ))}
-      <JobNotificationIcon>
-        {/* Icon component for job notifications */}
-      </JobNotificationIcon>
       <ProfilePictureLabel htmlFor="profile-picture">
         Upload Profile Picture
         <ProfilePictureUpload
@@ -219,9 +224,9 @@ const UsherDashboard = () => {
         />
       </ProfilePictureLabel>
       <ProfileUpdateForm onSubmit={handleProfileUpdate}>
-        <ProfileUpdateInput type="text" placeholder="First Name" />
-        <ProfileUpdateInput type="text" placeholder="Last Name" />
-        <ProfileUpdateInput type="email" placeholder="Email" />
+        <ProfileUpdateInput type="text" name="firstName" placeholder="First Name" />
+        <ProfileUpdateInput type="text" name="lastName" placeholder="Last Name" />
+        <ProfileUpdateInput type="email" name="email" placeholder="Email" />
         <ProfileUpdateButton type="submit">Update Profile</ProfileUpdateButton>
       </ProfileUpdateForm>
     </DashboardContainer>

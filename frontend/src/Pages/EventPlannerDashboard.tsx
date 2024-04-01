@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
-import { useHistory } from 'react-router-dom';
+//import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardContainer = styled.div`
   padding: 20px;
@@ -88,7 +89,7 @@ const ProfileUpdateButton = styled.button`
 `;
 
 const EventPlannerDashboard = () => {
-  const history = useHistory();
+    const navigate = useNavigate();
 
   // State variables...
 
@@ -130,11 +131,11 @@ const EventPlannerDashboard = () => {
   const handleProfileUpdate = (e) => {
     e.preventDefault();
     const updatedProfileData = {
-      firstName: // get first name value from form,
-      lastName: // get last name value from form,
-      email: // get email value from form,
-      // Add other fields as needed
+      firstName: '', // get first name value from form
+      lastName: '', // get last name value from form
+      email: '', // get email value from form
     };
+    
     axios.post('/api/update-profile', updatedProfileData)
       .then(response => {
         // Handle success
@@ -149,6 +150,7 @@ const EventPlannerDashboard = () => {
   return (
     <DashboardContainer>
       <h1>Event Planner Dashboard</h1>
+      <h2>Welcome to the Dashboard, {FirstName}!</h2>
       {/* Display ushers details and status */}
       {ushers.map(usher => (
         <UsherCard key={usher.id}>

@@ -8,13 +8,15 @@ import SignUpForm from './Pages/SignUp';
 import EventPlannerForm from './Pages/EventPlanner';
 import ForgotPasswordForm from './Pages/ForgotPass';
 import UsherDashboard from './Pages/Dashboard';
-import { BackgroundSection, FormSection, FormContainer,SignIn, CreateAccount, ButtonContainer, Button, ForgotPasswordLink, SignInFooter, RememberMeLabel, TermsOfServiceLink } from './styles';
+import EventPlannerDashboard from './Pages/EventPlannerDashboard';
+import { BackgroundSection, FormSection, FormContainer, SignIn, CreateAccount, ButtonContainer, Button, ForgotPasswordLink, SignInFooter, RememberMeLabel, TermsOfServiceLink } from './styles';
 
 import backgroundImage from './assets/background.jpg'; // Import your background image
 const baseURL = 'http://localhost:5000/api'; // Update with your Flask backend URL
 
 interface SignInData {
-  email: string;
+  username: string;
+  userType: string;
   password: string;
   rememberMe: boolean; // Add rememberMe property
 }
@@ -26,7 +28,8 @@ interface ErrorResponse {
 const SignInForm: React.FC = () => {
   const navigate = useNavigate();
   const [signInData, setSignInData] = useState<SignInData>({
-    email: '',
+    username: '',
+    userType: '',
     password: '',
     rememberMe: false, // Initialize rememberMe state
   });
@@ -51,7 +54,11 @@ const SignInForm: React.FC = () => {
       // Store token in local storage or session storage for future requests
       localStorage.setItem('token', token); // Example: Storing token in local storage
       // Redirect to user account page or perform any other action
-      navigate('/Pages/Dashboard');
+      if (signInData.userType === 'isUsher') {
+        navigate('/Pages/Dashboard');
+      } else {
+        navigate('/Pages/EventPlannerDashboard');
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const axiosError = error as any; // Use any type here
@@ -63,12 +70,12 @@ const SignInForm: React.FC = () => {
   };
 
   const handleCreateAccountClick = () => {
-    window.location.href = './Pages/SignUp';
+    navigate('/Pages/SignUp');
   };
 
   const handleForgotPasswordClick = () => {
     // Redirect to the forgot password page
-    window.location.href = './Pages/ForgotPass';
+    navigate('/Pages/ForgotPass');
   };
 
   return (
@@ -80,17 +87,17 @@ const SignInForm: React.FC = () => {
           <SignIn><h4>Sign In</h4></SignIn>
           {message && <p>{message}</p>}
           <form onSubmit={handleSubmit}>
-          <Input
-            type="email"
-            name="email"
-            value={signInData.email}
-            onChange={handleChange}
-            placeholder="Email Address"
-            iconLeft={<FaUser />} // Provide the email user icon as the iconLeft prop
-            required
-          />
             <Input
-             type={showPassword ? 'text' : 'password'}
+              type="username"
+              name="username"
+              value={signInData.username}
+              onChange={handleChange}
+              placeholder="Username"
+              iconLeft={<FaUser />} // Provide the email user icon as the iconLeft prop
+              required
+            />
+            <Input
+              type={showPassword ? 'text' : 'password'}
               name="password"
               value={signInData.password}
               onChange={handleChange}
@@ -99,6 +106,15 @@ const SignInForm: React.FC = () => {
               iconLeft={<FaKey />}
               iconRight={showPassword ? <FaEyeSlash onClick={togglePasswordVisibility} /> : <FaEye onClick={togglePasswordVisibility} />}
             />
+            <Input
+              type="userType"
+              name="userType"
+              value={signInData.userType}
+              onChange={handleChange}
+              placeholder="userType"
+              required
+            />
+            
             <SignInFooter>
               <RememberMeLabel>
                 <input
@@ -128,11 +144,13 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<SignInForm />} />
         <Route path="/Pages/SignUp" element={<SignUpForm />} />
-        <Route path="/Pages/EventPlanner" element={< EventPlannerForm />} />
+        <Route path="/Pages/EventPlanner" element={<EventPlannerForm />} />
         <Route path="/Pages/ForgotPass" element={<ForgotPasswordForm />} />
-        <Route path="/Pages/Dashboard" element={< UsherDashboard />} />
+        <Route path="/Pages/Dashboard" element={<UsherDashboard />} />
+        <Route path="/Pages/EventPlannerDashboard" element={<EventPlannerDashboard />} />
       </Routes>
     </Router>
   );
 };
+
 export default App;
