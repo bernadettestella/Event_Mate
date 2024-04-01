@@ -15,6 +15,9 @@ export const BackgroundSection = styled.div`
   height: 100vh;
   margin: 0;
   padding: 0;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 export const FormSection = styled.div`
@@ -31,6 +34,9 @@ export const FormContainer = styled.span`
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   padding: 5%;
   height: 78.2vh;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 export const SignIn = styled.div`
@@ -48,8 +54,7 @@ export const CreateAccount = styled.div`
 `;
 
 export const Input = styled.input`
-  margin-bottom: 10%;
-  padding: 15px;
+  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
   spacing: 4px;

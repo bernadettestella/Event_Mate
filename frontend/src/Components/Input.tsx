@@ -1,43 +1,71 @@
 import React from 'react';
 import styled from 'styled-components';
-import { InputProps as BaseInputProps } from './types';
 
 const InputContainer = styled.div`
   position: relative;
+  margin-bottom: 20px;
 `;
 
-const StyledInput = styled.input`
-  width: 100%;
-  padding: 8px;
+const Icon = styled.span`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  ${(props) => (props.position === 'left' ? 'left: 10px;' : 'right: 10px;')} /* Adjust icon position */
+  color: #aaa;
+  cursor: pointer; /* Add cursor pointer */
+`;
+
+const StyledInput = styled.input<{ hasIcon: boolean }>`
+  width: calc(100% - ${(props) => (props.hasIcon ? '40px' : '24px')}); /* Adjust width based on the presence of icons */
+  padding: 12px;
+  padding-left: ${(props) => (props.hasIcon ? '40px' : '12px')}; /* Adjust padding left */
+  padding-right: 12px; /* Fixed padding right */
   border: 1px solid #ccc;
   border-radius: 4px;
 `;
 
-const EndIconContainer = styled.div`
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-`;
-
-const StartIconContainer = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 10px;
-  transform: translateY(-50%);
-`;
-
-interface InputProps extends BaseInputProps {
-  endIcon?: React.ReactNode;
-  startIcon?: React.ReactNode;
+interface InputProps {
+  type: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  required?: boolean;
+  iconLeft?: React.ReactNode; // Add iconLeft prop
+  iconRight?: React.ReactNode; // Add iconRight prop
 }
 
-const Input: React.FC<InputProps> = ({ endIcon, startIcon, ...props }) => {
+const Input: React.FC<InputProps> = ({
+  type,
+  name,
+  value,
+  onChange,
+  placeholder,
+  required = false,
+  iconLeft,
+  iconRight,
+}) => {
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <InputContainer>
-      {startIcon && <StartIconContainer>{startIcon}</StartIconContainer>}
-      <StyledInput {...props} />
-      {endIcon && <EndIconContainer>{endIcon}</EndIconContainer>}
+      {iconLeft && <Icon position="left">{iconLeft}</Icon>}
+      <StyledInput
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        required={required}
+        hasIcon={!!iconLeft || !!iconRight} // Check if any icon is present
+      />
+      {iconRight && (
+        <Icon position="right" onClick={togglePasswordVisibility}>
+          {iconRight}
+        </Icon>
+      )}
     </InputContainer>
   );
 };
