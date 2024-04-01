@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaKey, FaUser } from 'react-icons/fa'; // Import icons for show/hide password
 import Input from './Components/Input';
@@ -23,6 +24,7 @@ interface ErrorResponse {
 }
 
 const SignInForm: React.FC = () => {
+  const navigate = useNavigate();
   const [signInData, setSignInData] = useState<SignInData>({
     email: '',
     password: '',
@@ -48,7 +50,7 @@ const SignInForm: React.FC = () => {
       // Assuming the backend returns a token upon successful login
       const token = response.data.token;
       // Redirect to user account page or perform any other action
-      window.location.href = './Pages/Dashboard'; // Redirect to the account page
+      navigate('./Pages/Dashboard');
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const axiosError = error as any; // Use any type here
@@ -79,7 +81,7 @@ const SignInForm: React.FC = () => {
           <form onSubmit={handleSubmit}>
           <Input
             type="email"
-            name="Email"
+            name="email"
             value={signInData.email}
             onChange={handleChange}
             placeholder="Email Address"
