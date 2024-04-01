@@ -10,6 +10,7 @@ import datetime
 import random
 
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'df02efcafd88339a979746fe'
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -63,25 +64,30 @@ def index() -> str:
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     ### Change request.args.get() to request.form.get() ####
-    hashed_password = bcrypt.generate_password_hash(request.args.get('password'))
-    username = request.args.get('username')
-    usertype = request.args.get('usertype')
-    email = request.args.get('email')
+    password = request.form.get('password')
+    username = request.form.get('username')
+    usertype = request.form.get('usertype')
+    email = request.form.get('email')
+    
+    if not password:
+      return jsonify({"ERR": "Password is required"})
 
+    hashed_password = bcrypt.generate_password_hash(password)
+   
     ### the usertype determines what type of user is registering (usher or planner)
     user = AUTH.register_user(usertype, username=username, password=hashed_password, email=email)
     if user is None:
-       return jsonify({"ERR": "User already exist"})
+      return jsonify({"ERR": "User already exist"})
     else:
-       return jsonify({user.username : user.id})
+      return jsonify({user.username: user.get_data()})
 
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
    try:
       ### Change request.args.get() to request.form.get() ####
-      username, password = (request.args.get('username'), request.args.get('password'))
-      usertype = request.args.get('usertype')
+      username, password = (request.form.get('username'), request.form.get('password'))
+      usertype = request.form.get('usertype')
       session_id = request.cookies.get("session")
 
       #Usertype determines what kind of user is logging-in (usher or planner)
@@ -100,11 +106,11 @@ def login():
        return jsonify({"Error": err.args[0], "reason" : "unauthorized user or invalid login reqst"})
 
 
-@app.route('/dashboard', strict_slashes=False, methods=['GET', 'POST'])
+"""@app.route('/dashboard', strict_slashes=False, methods=['GET', 'POST'])
 @login_required
 def dashboard():
    user : Union[usher.Usher | planner.Planner] = current_user
-   return jsonify({"user": user.username})
+   return jsonify({"user": user.username}) """
 
 
 @app.route("/users/<user_type>", methods=["GET"])
@@ -131,27 +137,27 @@ def user(user_type, user_id):
       except:
          return abort(400)
    try:
-      user = AUTH.db.searchUser(models.get(user_type), id=user_id)
-      return jsonify({"user" : user.id})
+      user = AUTH.db.searchitem(models.get(user_type), id=user_id)
+      return jsonify({"user" : user.username})
    except NoResultFound:
       return jsonify({"err" : "No result found"})
 
 @app.route('/forgot-password', methods=["POST", "GET"])
 def forgot_password():
-   email = request.args.get('email')
+   email = request.form.get('email')
    try:
       try:
          print("SEARCHING PLANNER...........................")
          user = AUTH.db.searchitem(planner.Planner, email=email)
          token = random.randbytes(6).hex()
-         updated_user = AUTH.update_item("planner", user.id, _rand_auth=token)
+         updated_user = AUTH.update_item("planner", user.id, {'_rand_auth':token})
          return jsonify({"token": updated_user._rand_auth})
       except:
          try:
             print("SEARCHING USHER........................")
             user = AUTH.db.searchitem(usher.Usher, email=email)
             token = random.randbytes(6).hex()
-            updated_user = AUTH.update_item("usher", user.id, _rand_auth=token)
+            updated_user = AUTH.update_item("usher", user.id, {'_rand_auth':token})
             return jsonify({"token": updated_user._rand_auth})
          except:
             return jsonify({"error": "User not found"})
@@ -161,14 +167,14 @@ def forgot_password():
 
 @app.route('/reset-password/<token>', methods=['POST', 'GET'])
 def reset_password(token):
-   email = request.args.get('email')
-   new_password = request.args.get("new_password")
+   email = request.form.get('email')
+   new_password = request.form.get("new_password")
    try:
       try:
          user = AUTH.db.searchitem(planner.Planner, email=email)
          if token == user._rand_auth:
             hashed_password = bcrypt.generate_password_hash(new_password)
-            AUTH.update_item("planner", user.id, password=hashed_password)
+            AUTH.update_item("planner", user.id, {'password':hashed_password})
             return jsonify({"status" : "ok"})
          else:
             return jsonify({"err": "Invalid Token"})
@@ -176,7 +182,7 @@ def reset_password(token):
          user = AUTH.db.searchitem(usher.Usher, email=email)
          if token == user._rand_auth:
             hashed_password = bcrypt.generate_password_hash(new_password)
-            AUTH.update_item("usher", user.id, password=hashed_password)
+            AUTH.update_item("usher", user.id, {'password':hashed_password})
             return jsonify({"status" : "ok"})
          else:
             return jsonify({"err": "Invalid Token"})
@@ -187,6 +193,10 @@ def reset_password(token):
 @app.route("/postjob", methods=["GET", "POST"])
 @login_required
 def postjob():
+   description = request.form.get("description")
+   payment_amount = request.form.get("payment_amount")
+   if description is None or payment_amount is None:
+      abort(400)
    # ensure all forms fields are collected using request.form.get() and passed as
    # second arguments to the AUTH.search_secific_table() function below
    user = current_user
@@ -194,8 +204,8 @@ def postjob():
    if confirmed_user is None:
       abort(400)
    try:
-      AUTH.db.postjob(confirmed_user.id, job_amount=2000)
-      return jsonify({"status" : "ok"})
+      job = AUTH.db.postjob(confirmed_user.id, {"job_description":description, "job_amount":payment_amount})
+      return jsonify({"status" : job.db_id})
    except:
       abort(400)
    
@@ -204,15 +214,16 @@ def postjob():
 def hire(usher_id, job_id):
    try:
       job = AUTH.hire(usher_id, job_id)
-      return jsonify({"status": job.hired_ushers})
+      return jsonify({"status": job})
    except:
       abort(400)
 
-@app.route("/update/<user_type>/<user_id>")
+@app.route("/update/<user_type>/<user_id>/<update_param>", methods=["POST"])
 @login_required
-def update_user(user_type, user_id):
+def update_user(user_type, user_id, update_param):
+   param = request.form.get(update_param)
    try:
-      updated_user = AUTH.update_item(user_type, user_id, email="bernadettestella27@gmail.com")
+      updated_user = AUTH.update_item(user_type, user_id, {update_param:param})
       return jsonify({"status" : "ok", "response" : updated_user.age})
    except:
       abort(400)
@@ -225,4 +236,4 @@ def logout():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="5000")
+    app.run(host="0.0.0.0", port="5000", debug=True)

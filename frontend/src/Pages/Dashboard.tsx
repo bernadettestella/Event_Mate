@@ -1,67 +1,231 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faSearch } from '@fortawesome/free-solid-svg-icons';
 
-// Styled components for the navigation bar
-const Navbar = styled.nav`
-  background-color: #333;
-  overflow: hidden;
+const DashboardContainer = styled.div`
+  padding: 20px;
 `;
 
-const NavLink = styled.a`
-  float: left;
-  display: block;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 20px;
-  text-decoration: none;
-  font-size: 17px;
-
-  &:hover {
-    background-color: #ddd;
-    color: black;
-  }
+const SearchBar = styled.input`
+  width: 300px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 20px;
 `;
 
-const IconContainer = styled.div`
-  float: right;
+const FilterJobs = styled.select`
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 10px;
 `;
 
-const SearchIcon = styled.div`
-  float: right;
-  margin-top: 13px;
-  margin-right: 20px;
+const UsherCard = styled.div`
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
 `;
 
-interface DashboardProps {
-  userName: string;
-}
+const EventCard = styled.div`
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+`;
 
-const Dashboard: React.FC<DashboardProps> = ({ userName }) => {
+const JobNotificationIcon = styled.div`
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+`;
+
+const ProfilePictureUpload = styled.input`
+  display: none;
+`;
+
+const ProfilePictureLabel = styled.label`
+  display: inline-block;
+  background-color: #007bff;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 20px;
+`;
+
+const ProfileUpdateForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  margin-bottom: 20px;
+`;
+
+const ProfileUpdateInput = styled.input`
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+`;
+
+const ProfileUpdateButton = styled.button`
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+`;
+
+const UsherDashboard = () => {
+  const [ushers, setUshers] = useState([]);
+  const [filteredUshers, setFilteredUshers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterOption, setFilterOption] = useState('');
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    // Fetch ushers data from API
+    axios.get('/api/ushers')
+      .then(response => {
+        setUshers(response.data);
+        setFilteredUshers(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching ushers data:', error);
+      });
+
+    // Fetch events data from API
+    axios.get('/api/events')
+      .then(response => {
+        setEvents(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching events data:', error);
+      });
+  }, []);
+
+  useEffect(() => {
+    // Apply search filter
+    const filtered = ushers.filter(usher => {
+      return usher.name.toLowerCase().includes(searchQuery.toLowerCase());
+    });
+    setFilteredUshers(filtered);
+  }, [searchQuery, ushers]);
+
+  useEffect(() => {
+    // Apply filter option
+    if (filterOption === 'hired') {
+      const hiredUshers = ushers.filter(usher => usher.status === 'hired');
+      setFilteredUshers(hiredUshers);
+    } else if (filterOption === 'available') {
+      const availableUshers = ushers.filter(usher => usher.status === 'available');
+      setFilteredUshers(availableUshers);
+    } else {
+      setFilteredUshers(ushers);
+    }
+  }, [filterOption, ushers]);
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleFilterChange = (e) => {
+    setFilterOption(e.target.value);
+  };
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    // Send file to server and update profile picture
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+    axios.post('/api/upload-profile-picture', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    .then(response => {
+      // Handle success
+      console.log(response.data);
+    })
+    .catch(error => {
+      // Handle error
+      console.error('Error uploading profile picture:', error);
+    });
+  };
+
+  const handleProfileUpdate = (e) => {
+    e.preventDefault();
+    const updatedProfileData = {
+      firstName: // get first name value from form,
+      lastName: // get last name value from form,
+      email: // get email value from form,
+      // Add other fields as needed
+    };
+    axios.post('/api/update-profile', updatedProfileData)
+      .then(response => {
+        // Handle success
+        console.log(response.data);
+      })
+      .catch(error => {
+        // Handle error
+        console.error('Error updating profile:', error);
+      });
+  };
+
+
   return (
-    <div>
-      <Navbar>
-        <NavLink href="#">Home</NavLink>
-        <NavLink href="#">About Us</NavLink>
-        <NavLink href="#">Our Services</NavLink>
-        <NavLink href="#">Contact Us</NavLink>
-        <NavLink href="#">Apply</NavLink>
-        <IconContainer>
-          <NavLink href="#"><FontAwesomeIcon icon={faUser} /></NavLink>
-        </IconContainer>
-        <SearchIcon>
-          <FontAwesomeIcon icon={faSearch} />
-        </SearchIcon>
-      </Navbar>
-
-      {/* Welcome message */}
-      <div>
-        <h1>Welcome, {userName} to EventMate</h1>
-        {/* Add more content as needed */}
-      </div>
-    </div>
+    <DashboardContainer>
+      <h1>EventMate Dashboard</h1>
+      <SearchBar
+        type="text"
+        placeholder="Search Ushers..."
+        value={searchQuery}
+        onChange={handleSearchChange}
+      />
+      <FilterJobs value={filterOption} onChange={handleFilterChange}>
+        <option value="">All Jobs</option>
+        <option value="hired">Hired</option>
+        <option value="available">Available</option>
+      </FilterJobs>
+      {filteredUshers.map(usher => (
+        <UsherCard key={usher.id}>
+          <h2>{usher.name}</h2>
+          <p>Status: {usher.status}</p>
+          {/* Display other usher information here */}
+        </UsherCard>
+      ))}
+      <h2>Available Events</h2>
+      {events.map(event => (
+        <EventCard key={event.id}>
+          <h3>{event.name}</h3>
+          {/* Display other event information here */}
+        </EventCard>
+      ))}
+      <JobNotificationIcon>
+        {/* Icon component for job notifications */}
+      </JobNotificationIcon>
+      <ProfilePictureLabel htmlFor="profile-picture">
+        Upload Profile Picture
+        <ProfilePictureUpload
+          type="file"
+          id="profile-picture"
+          onChange={handleProfilePictureChange}
+        />
+      </ProfilePictureLabel>
+      <ProfileUpdateForm onSubmit={handleProfileUpdate}>
+        <ProfileUpdateInput type="text" placeholder="First Name" />
+        <ProfileUpdateInput type="text" placeholder="Last Name" />
+        <ProfileUpdateInput type="email" placeholder="Email" />
+        <ProfileUpdateButton type="submit">Update Profile</ProfileUpdateButton>
+      </ProfileUpdateForm>
+    </DashboardContainer>
   );
 };
 
-export default Dashboard;
+export default UsherDashboard;
