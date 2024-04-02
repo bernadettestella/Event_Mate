@@ -49,7 +49,7 @@ Methods: POST, GET
 Description: Reset the password of the user with the given token.
 Parameters:
 email (string, required): The email of the user.
-new_password (string, required): The new password of the user.
+new_password (string, required): The new password of the user.^x
 Returns: A status message indicating whether the password was reset successfully.
 
 /postjob
