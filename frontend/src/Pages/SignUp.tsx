@@ -4,28 +4,31 @@ import styled from 'styled-components';
 import CountrySelector from '../Components/Country';
 import { AsYouType } from 'libphonenumber-js';
 import EventPlannerForm from './EventPlanner';
-import backgroundImage from '../assets/background.jpg';
+//import backgroundImage from '../assets/background.jpg';
 import Button from '../Components/Button';
+//import { FormSection } from '../styles';
 
-const baseURL = 'http://localhost:5000/api';
+//const baseURL = 'http://localhost:5000/api'
 
-const BackgroundSection = styled.div`
-  flex: 1;
-  background-image: url(${backgroundImage});
-  background-size: cover;
-  background-position: center;
-  width: 1400px;
-  height: 100vh;
+export const FormSection = styled.div`
+ flex: 1;
   display: flex;
-  justify-content: right;
-  align-items: center;
-`;
+  width: 1400px;
+  align: center;
+  justify-content: center;
+  margin-top: 10px;
+  @media (max-width: 768px) {
+    width: 100%;
 
+`;
 const FormContainer = styled.div`
-  width: 35%;
+  width: 35%x;
   background: #fff;
-  padding: 2%;
-  border: 0.5px solid #ccc;
+  justify-content: center;
+  align-items: center;
+  padding: 1%;
+  border: 0.1px solid #ccc;
+  margin-top: 10px;
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -107,6 +110,7 @@ const SignUpForm = () => {
     username: '',
     firstName: '',
     lastName: '',
+    userType: 'isUsher',
     password: '',
     confirmPassword: '',
     age: '',
@@ -152,9 +156,9 @@ const SignUpForm = () => {
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length === 0) {
       try {
-        const response = await axios.post(`${baseURL}/register`, signUpData); // Adjust the URL as per your backend setup
-        console.log(response.data);
-        // Handle successful signup, e.g., redirect to login page
+        const response = await axios.post('http://localhost:5000/api/register', signUpData);
+        setMessage('Registration successful. Please log in.'); // Display success message
+        navigate('/login');
       } catch (error) {
         setMessage('An error occurred during sign-up.');
       }
@@ -162,8 +166,7 @@ const SignUpForm = () => {
   };
 
   return (
-    <BackgroundSection>
-      {isUsher && (
+        <FormSection>
         <FormContainer>
           <h2>Usher Sign Up</h2>
           {message && <ErrorMessage>{message}</ErrorMessage>}
@@ -174,7 +177,7 @@ const SignUpForm = () => {
                 checked={isUsher}
                 onChange={handleToggle}
               />
-              {isUsher ? 'Usher' : 'Event Planner'}
+              {isUsher ? 'Usher' : 'Planner'}
             </ToggleLabel>
           </ToggleContainer>
           {isUsher && (
@@ -308,10 +311,8 @@ const SignUpForm = () => {
           )}
           {!isUsher && <EventPlannerForm />}
         </FormContainer>
+        </FormSection>
       )}
-      {!isUsher && <EventPlannerForm />}
-    </BackgroundSection>
-  );
-};
+
 
 export default SignUpForm;

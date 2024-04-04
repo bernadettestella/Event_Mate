@@ -23,8 +23,9 @@ export const BackgroundSection = styled.div`
 export const FormSection = styled.div`
  flex: 1;
   display: flex;
-  align: right;
-  justify-content: right;
+  width: 1400px;
+  align: center;
+  justify-content: center;
 
 `;
 

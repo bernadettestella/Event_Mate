@@ -2,20 +2,18 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 
-import backgroundImage from '../assets/background.jpg';
+//import backgroundImage from '../assets/background.jpg';
 import Button from '../Components/Button'; 
-const baseURL = 'http://localhost:5000/api';
+//const baseURL = 'http://localhost:5000/api';
 
 // Styled components for styling
 const BackgroundSection = styled.div`
   flex: 1;
-  background-image: url(${backgroundImage});
-  background-size: cover;
   background-position: center;
   width: 1400px;
   height: 100vh;
   display: flex;
-  justify-content: right;
+  justify-content: center;
   align-items: center;
 `;
 
@@ -23,7 +21,6 @@ const FormContainer = styled.div`
 width: 35%;
   background: #fff;
   padding: 2%;
-  justify-content: right;
   border: 0.5px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -33,7 +30,7 @@ width: 35%;
 `;
 
 const FormGroup = styled.div`
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.1rem;
 `;
 
 const Label = styled.label`

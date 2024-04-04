@@ -5,14 +5,16 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaKey, FaUser } from 'react-icons/fa'; // Import icons for show/hide password
 import Input from './Components/Input';
 import SignUpForm from './Pages/SignUp';
+import Navbar from './Components/Navbar'
+//import Home from './Pages/home'
 import EventPlannerForm from './Pages/EventPlanner';
 import ForgotPasswordForm from './Pages/ForgotPass';
 import UsherDashboard from './Pages/Dashboard';
 import EventPlannerDashboard from './Pages/EventPlannerDashboard';
-import { BackgroundSection, FormSection, FormContainer, SignIn, CreateAccount, ButtonContainer, Button, ForgotPasswordLink, SignInFooter, RememberMeLabel, TermsOfServiceLink } from './styles';
+import { FormSection, FormContainer, SignIn, CreateAccount, ButtonContainer, Button, ForgotPasswordLink, SignInFooter, RememberMeLabel, TermsOfServiceLink } from './styles';
 
-import backgroundImage from './assets/background.jpg'; // Import your background image
-const baseURL = 'http://localhost:5000/api'; // Update with your Flask backend URL
+//import backgroundImage from './assets/background.jpg'; // Import your background image
+//const baseURL = 'http://localhost:5000/api'; // Update with your Flask backend URL
 
 interface SignInData {
   username: string;
@@ -49,7 +51,7 @@ const SignInForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${baseURL}/login`, signInData); // Send login request to backend
+      const response = await axios.post('/api/login', signInData);  // Send login request to backend
       const token = response.data.token;
       // Store token in local storage or session storage for future requests
       localStorage.setItem('token', token); // Example: Storing token in local storage
@@ -79,7 +81,6 @@ const SignInForm: React.FC = () => {
   };
 
   return (
-    <BackgroundSection style={{ backgroundImage: `url(${backgroundImage})` }}>
       <FormSection>
         <FormContainer>
           <h1>EventMate</h1>
@@ -134,13 +135,14 @@ const SignInForm: React.FC = () => {
           </form>
         </FormContainer>
       </FormSection>
-    </BackgroundSection>
+  
   );
 }; 
 
 const App: React.FC = () => {
   return (
     <Router>
+       <Navbar /> {/* Include the Navbar component */}
       <Routes>
         <Route path="/" element={<SignInForm />} />
         <Route path="/Pages/SignUp" element={<SignUpForm />} />
